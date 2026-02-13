@@ -1,6 +1,6 @@
 package lesson01;
 
-import com.lesson01.StringValidator;
+import com.week01.StringValidator;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;

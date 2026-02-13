@@ -1,4 +1,4 @@
-package com.lesson01;
+package com.week01;
 
 public class StringValidator {
 

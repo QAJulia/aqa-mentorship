@@ -10,10 +10,10 @@ All tasks must be created in your own repo in a "week1" branch.
 Create a new class `Calculator` in `src/main/java/com/lesson01/Calculator.java` with the following methods:
 
 ```java
-package com.lesson01;
+package com.week01;
 
 public class Calculator {
-    
+
     /**
      * Adds two numbers
      * @return sum of a and b
@@ -21,7 +21,7 @@ public class Calculator {
     public int add(int a, int b) {
         // TODO: implement
     }
-    
+
     /**
      * Subtracts b from a
      * @return difference of a and b
@@ -29,7 +29,7 @@ public class Calculator {
     public int subtract(int a, int b) {
         // TODO: implement
     }
-    
+
     /**
      * Multiplies two numbers
      * @return product of a and b
@@ -37,7 +37,7 @@ public class Calculator {
     public int multiply(int a, int b) {
         // TODO: implement
     }
-    
+
     /**
      * Divides a by b
      * @return quotient of a and b
@@ -47,7 +47,7 @@ public class Calculator {
         // TODO: implement
         // Remember to throw ArithmeticException when b == 0
     }
-    
+
     /**
      * Checks if number is even
      * @return true if number is even, false otherwise
@@ -81,48 +81,48 @@ Create `CalculatorTest` in `src/test/java/lesson01/CalculatorTest.java`.
 ```java
 package lesson01;
 
-import com.lesson01.Calculator;
+import com.week01.Calculator;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
 public class CalculatorTest {
-    
+
     private Calculator calculator;
     private static int testCounter = 0;
-    
+
     @BeforeSuite
     public void beforeSuite() {
         System.out.println("=== Starting Calculator Test Suite ===");
     }
-    
+
     @AfterSuite
     public void afterSuite() {
         System.out.println("=== Calculator Test Suite Completed ===");
     }
-    
+
     @BeforeClass
     public void beforeClass() {
         System.out.println("Setting up Calculator test class");
         testCounter = 0;
     }
-    
+
     @AfterClass
     public void afterClass() {
         System.out.println("Tests completed. Total tests run: " + testCounter);
     }
-    
+
     @BeforeMethod
     public void setUp() {
         calculator = new Calculator();
         System.out.println("Preparing for test...");
     }
-    
+
     @AfterMethod
     public void tearDown() {
         testCounter++;
         System.out.println("Test finished!");
     }
-    
+
     // TODO: Add your test methods here
 }
 ```

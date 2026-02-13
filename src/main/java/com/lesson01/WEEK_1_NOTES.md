@@ -1,6 +1,7 @@
-# Lesson 01: TestNG Basics - Notes
+# Week 01: TestNG Basics
 
-This document covers the fundamentals of test automation with TestNG, Maven, and Java.
+This kind of documents covers the fundamentals of every week topic. In every week folder you will find similar 
+NOTES document which will help you in your way to aqa position.
 
 ---
 
