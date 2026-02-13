@@ -259,62 +259,6 @@ mvn test -DsuiteXmlFile=testng.xml
 
 ---
 
-## Task 7: Troubleshooting
-
-### Issue: FileNotFoundException for CSV/YAML files
-
-**Solution:**
-- Ensure files are in `src/test/resources/`
-- Check file names match exactly (case-sensitive)
-- Use absolute path: `new File("src/test/resources/lesson02/people.csv").getAbsolutePath()`
-
-### Issue: Lombok annotations not working
-
-**Solution:**
-- Verify Lombok is in pom.xml with `<scope>provided</scope>`
-- Enable annotation processing in IDE:
-  - IntelliJ: Settings → Build → Compiler → Annotation Processors → Enable
-  - Eclipse: Install Lombok plugin
-
-### Issue: DataProvider returns empty data
-
-**Solution:**
-- Print file contents to verify format
-- Check file path and encoding (use UTF-8)
-- Verify CSVReader/YAMLReader methods are implemented
-
-### Issue: Tests fail with null values
-
-**Solution:**
-- Add null checks in assertions
-- Print person object before assertion: `System.out.println(person)`
-- Check data in CSV/YAML files is complete
-
----
-
-## Submission Checklist
-
-**Before submitting, verify:**
-
-- [ ] Person class uses Lombok annotations correctly
-- [ ] CSV file has 4 records (John, Jane, Bob, Alice)
-- [ ] YAML file has 3 records (Michael, Pam, Jim)
-- [ ] CSVReader implementation reads CSV correctly
-- [ ] YAMLReader implementation reads YAML correctly
-- [ ] DataProviders return correct Object[][] format
-- [ ] Average age calculation is correct
-- [ ] Oldest person detection is correct
-- [ ] Youngest person detection is correct
-- [ ] All 5 test methods pass when run individually
-- [ ] testng.xml configures smoke and regression groups
-- [ ] Smoke suite runs 2 tests
-- [ ] Regression suite runs 3 tests
-- [ ] Full suite runs 5 tests
-- [ ] All tests are runnable via Maven
-- [ ] No warnings or errors in console
-
----
-
 ## Bonus Challenges
 
 ### Challenge 1: Sorting
@@ -331,26 +275,4 @@ Modify testng.xml to run tests in parallel and verify they still pass:
 ```xml
 <suite name="Parallel Suite" parallel="methods" thread-count="2">
 ```
-
-### Challenge 5: Custom Listener
-Create an `ITestListener` that logs test start/finish with execution time, then register it in testng.xml.
-
----
-
-## Resources for Help
-
-- CSV Format: [RFC 4180](https://tools.ietf.org/html/rfc4180)
-- YAML Format: [YAML Official Spec](https://yaml.org/)
-- TestNG Groups: [TestNG Groups Documentation](https://testng.io/doc/documentation-main.html#groups-and-method-selectors)
-- Lombok: [Project Lombok Docs](https://projectlombok.org/features/)
-
----
-
-## Questions to Consider
-
-1. Why would you use CSV over YAML or vice versa?
-2. What's the advantage of DataProviders over hardcoded test cases?
-3. How does Lombok improve code maintainability?
-4. When should you use `@Parameters` vs `@DataProvider`?
-5. How can test grouping improve CI/CD pipelines?
 
