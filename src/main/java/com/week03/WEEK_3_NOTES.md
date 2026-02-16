@@ -83,32 +83,7 @@ Replace your existing `maven-surefire-plugin` with:
 </plugin>
 ```
 
-### Step 3: Reload Maven
-
-In IntelliJ: **Maven tool window → click refresh icon**
-
----
-
-## 3. Install Allure CLI
-
-**macOS:**
-```bash
-brew install allure
-```
-
-**Windows:**
-```bash
-scoop install allure
-```
-
-**Verify:**
-```bash
-allure --version
-```
-
----
-
-## 4. Allure Annotations
+## 3. Allure Annotations
 
 ### Business Hierarchy
 
@@ -136,7 +111,7 @@ public List<Person> loadFromCSV() {
 
 ---
 
-## 5. TestNG Listeners
+## 4. TestNG Listeners
 
 ### ITestListener - Test Execution Hooks
 
@@ -210,7 +185,7 @@ public class SuiteListener implements ISuiteListener {
 
 ---
 
-## 6. Create Step Methods
+## 5. Create Step Methods
 
 ```java
 package com.week03.steps;
@@ -245,7 +220,7 @@ public class AllurePeopleSteps {
 
 ---
 
-## 7. Create Test Class with Allure
+## 6. Create Test Class with Allure
 
 ```java
 package week03;
@@ -294,7 +269,7 @@ public class AllurePeopleTests {
 
 ---
 
-## 8. Run Tests and Generate Report
+## 7. Run Tests and Generate Report
 
 ### Run tests
 
@@ -321,46 +296,6 @@ allure generate target/allure-results -o allure-report --clean
 Then open: `allure-report/index.html`
 
 ---
-
-## 9. What You'll See in Report
-
-### Overview
-- Total tests, pass rate, duration
-- Graphs (pie chart, trends)
-
-### Behaviors Tab
-```
-People Management (Epic)
-└── Statistics (Feature)
-    ├── Average age calculation (Story)
-    │   └── testAverageAge
-    └── Oldest person (Story)
-        └── testFindOldest
-```
-
-### Test Details
-Click on a test to see:
-- Test steps (from @Step methods)
-- Attachments (added via Allure.addAttachment)
-- Duration, status, error details (if failed)
-
----
-
-## 10. Common Commands
-
-```bash
-# Run all tests
-mvn clean test
-
-# Run specific group
-mvn test -Dgroups=smoke
-
-# Generate and open report
-allure serve target/allure-results
-
-# Clean old results
-mvn clean
-```
 
 
 ## Resources
