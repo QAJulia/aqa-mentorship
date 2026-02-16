@@ -1,4 +1,4 @@
-# Lesson 01: Tasks
+# Week 01: Tasks
 
 Complete the following tasks to practice TestNG concepts: annotations, data providers, assertions, and the AAA pattern.
 All tasks must be created in your own repo in a "week1" branch.
@@ -7,7 +7,7 @@ All tasks must be created in your own repo in a "week1" branch.
 
 ## Task 1: Create Calculator Class
 
-Create a new class `Calculator` in `src/main/java/com/lesson01/Calculator.java` with the following methods:
+Create a new class `Calculator` in `src/main/java/com/week01/Calculator.java` with the following methods:
 
 ```java
 package com.week01;
@@ -62,7 +62,7 @@ public class Calculator {
 
 ## Task 2: Create Test Class with All Hooks
 
-Create `CalculatorTest` in `src/test/java/lesson01/CalculatorTest.java`.
+Create `CalculatorTest` in `src/test/java/week01/CalculatorTest.java`.
 
 ### Requirements:
 
@@ -79,7 +79,7 @@ Create `CalculatorTest` in `src/test/java/lesson01/CalculatorTest.java`.
 ### Example structure:
 
 ```java
-package lesson01;
+package week01;
 
 import com.week01.Calculator;
 import org.testng.Assert;
@@ -293,11 +293,11 @@ If stuck:
 1. Commit your code to Git:
    ```bash
    git add .
-   git commit -m "Completed Lesson 01 homework"
+   git commit -m "Completed Week 01 homework"
    git push
    ```
 
 2. Create a Pull Request with:
-   - Title: "Lesson 01: Calculator Tests Implementation"
+   - Title: "Week 01: Calculator Tests Implementation"
    - Description: Brief summary of what you implemented
    - Screenshot or paste of console output showing hooks and test results

@@ -1,4 +1,4 @@
-package lesson01;
+package week01;
 
 import com.week01.StringValidator;
 import org.testng.Assert;

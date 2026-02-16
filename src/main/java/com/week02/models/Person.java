@@ -1,4 +1,4 @@
-package com.lesson02.models;
+package com.week02.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

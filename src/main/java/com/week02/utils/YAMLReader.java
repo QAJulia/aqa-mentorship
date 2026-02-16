@@ -1,6 +1,6 @@
-package com.lesson02.utils;
+package com.week02.utils;
 
-import com.lesson02.models.Person;
+import com.week02.models.Person;
 import org.yaml.snakeyaml.Yaml;
 import java.io.FileInputStream;
 import java.io.IOException;

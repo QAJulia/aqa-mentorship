@@ -7,7 +7,7 @@
             </run>
         </groups>
         <classes>
-            <class name="lesson02.PeopleTests"/>
+            <class name="week02.PeopleTests"/>
         </classes>
     </test>
 </suite>

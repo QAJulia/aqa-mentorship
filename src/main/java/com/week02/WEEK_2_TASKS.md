@@ -59,7 +59,7 @@ Steps from this Task must be created in your repo. Try to implement methods your
 you can find solution in this repo and copy it.
 
 **What you need to do:**
-1. In your repo create the test class: `src/test/java/lesson02/PeopleTests.java`
+1. In your repo create the test class: `src/test/java/week02/PeopleTests.java`
 2. Implement the following private static methods in the test class (or in a helper class):
 
 ### 3a. Calculate Average Age
@@ -106,7 +106,7 @@ private static Person findYoungestPerson(List<Person> people) {
 ## Task 4: Implement DataProviders
 
 **What you need to do:**
-1. Open `src/test/java/lesson02/PeopleTests.java`
+1. Open `src/test/java/week02/PeopleTests.java`
 2. Implement the following DataProviders:
 
 ### 4a. CSV DataProvider
@@ -119,7 +119,7 @@ public Object[][] getPeopleFromCSV() throws IOException {
 ```
 
 **Expected:**
-- Reads `src/test/resources/lesson02/people.csv`
+- Reads `src/test/resources/week02/people.csv`
 - Returns Object[][] where each row is [Person]
 - Rows: 4 (Robert, Jimmy, John, John)
 
@@ -133,7 +133,7 @@ public Object[][] getPeopleFromYAML() throws IOException {
 ```
 
 **Expected:**
-- Reads `src/test/resources/lesson02/people.yaml`
+- Reads `src/test/resources/week02/people.yaml`
 - Returns Object[][] where each row is [Person]
 - Rows: 4 (Robert, Jimmy, John, John)
 
@@ -156,7 +156,7 @@ public Object[][] getCombinedPeopleData() throws IOException {
 ## Task 5: Implement Test Methods
 
 **What you need to do:**
-Implement the following test methods in `src/test/java/lesson02/PeopleTests.java`:
+Implement the following test methods in `src/test/java/week02/PeopleTests.java`:
 
 ### 5a. Test Individual CSV Records
 ```java
@@ -186,8 +186,8 @@ public void testYAMLPersonData(Person person) {
 public void testAverageAgeCalculation() throws IOException {
     // TODO: Load combined data and calculate average age
     List<Person> people = new ArrayList<>();
-    people.addAll(CSVReader.readPersonsFromCSV("src/test/resources/lesson02/people.csv"));
-    people.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/lesson02/people.yaml"));
+    people.addAll(CSVReader.readPersonsFromCSV("src/test/resources/week02/people.csv"));
+    people.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/week02/people.yaml"));
     
     double averageAge = calculateAverageAge(people);
     
@@ -204,8 +204,8 @@ public void testAverageAgeCalculation() throws IOException {
 public void testFindOldestPerson() throws IOException {
     // TODO: Load combined data and find oldest person
     List<Person> people = new ArrayList<>();
-    people.addAll(CSVReader.readPersonsFromCSV("src/test/resources/lesson02/people.csv"));
-    people.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/lesson02/people.yaml"));
+    people.addAll(CSVReader.readPersonsFromCSV("src/test/resources/week02/people.csv"));
+    people.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/week02/people.yaml"));
     
     Person oldest = findOldestPerson(people);
     
@@ -221,8 +221,8 @@ public void testFindOldestPerson() throws IOException {
 public void testFindYoungestPerson() throws IOException {
     // TODO: Load combined data and find youngest person
     List<Person> people = new ArrayList<>();
-    people.addAll(CSVReader.readPersonsFromCSV("src/test/resources/lesson02/people.csv"));
-    people.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/lesson02/people.yaml"));
+    people.addAll(CSVReader.readPersonsFromCSV("src/test/resources/week02/people.csv"));
+    people.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/week02/people.yaml"));
     
     Person youngest = findYoungestPerson(people);
     

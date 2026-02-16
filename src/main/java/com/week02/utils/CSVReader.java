@@ -1,7 +1,7 @@
-package com.lesson02.utils;
+package com.week02.utils;
 
 
-import com.lesson02.models.Person;
+import com.week02.models.Person;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;

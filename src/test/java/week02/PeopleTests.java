@@ -1,8 +1,8 @@
-package lesson02;
+package week02;
 
-import com.lesson02.models.Person;
-import com.lesson02.utils.CSVReader;
-import com.lesson02.utils.YAMLReader;
+import com.week02.models.Person;
+import com.week02.utils.CSVReader;
+import com.week02.utils.YAMLReader;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -34,7 +34,7 @@ public class PeopleTests {
      */
     @DataProvider(name = "peopleFromCSV")
     public Object[][] getPeopleFromCSV() throws IOException {
-        List<Person> persons = CSVReader.readPersonsFromCSV("src/test/resources/lesson02/people.csv");
+        List<Person> persons = CSVReader.readPersonsFromCSV("src/test/resources/week02/people.csv");
         Object[][] data = new Object[persons.size()][1];
 
         for (int i = 0; i < persons.size(); i++) {
@@ -50,7 +50,7 @@ public class PeopleTests {
      */
     @DataProvider(name = "peopleFromYAML")
     public Object[][] getPeopleFromYAML() throws IOException {
-        List<Person> persons = YAMLReader.readPersonsFromYAML("src/test/resources/lesson02/people.yaml");
+        List<Person> persons = YAMLReader.readPersonsFromYAML("src/test/resources/week02/people.yaml");
         Object[][] data = new Object[persons.size()][1];
 
         for (int i = 0; i < persons.size(); i++) {
@@ -69,10 +69,10 @@ public class PeopleTests {
         List<Person> allPersons = new ArrayList<>();
 
         // Add CSV data
-        allPersons.addAll(CSVReader.readPersonsFromCSV("src/test/resources/lesson02/people.csv"));
+        allPersons.addAll(CSVReader.readPersonsFromCSV("src/test/resources/week02/people.csv"));
 
         // Add YAML data
-        allPersons.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/lesson02/people.yaml"));
+        allPersons.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/week02/people.yaml"));
 
         Object[][] data = new Object[allPersons.size()][1];
 
@@ -143,8 +143,8 @@ public class PeopleTests {
     public void testAverageAgeCalculation() throws IOException {
         // Load all people from both sources
         List<Person> people = new ArrayList<>();
-        people.addAll(CSVReader.readPersonsFromCSV("src/test/resources/lesson02/people.csv"));
-        people.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/lesson02/people.yaml"));
+        people.addAll(CSVReader.readPersonsFromCSV("src/test/resources/week02/people.csv"));
+        people.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/week02/people.yaml"));
 
         // Calculate average age
         double averageAge = calculateAverageAge(people);
@@ -168,8 +168,8 @@ public class PeopleTests {
     public void testFindOldestPerson() throws IOException {
         // Load all people from both sources
         List<Person> people = new ArrayList<>();
-        people.addAll(CSVReader.readPersonsFromCSV("src/test/resources/lesson02/people.csv"));
-        people.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/lesson02/people.yaml"));
+        people.addAll(CSVReader.readPersonsFromCSV("src/test/resources/week02/people.csv"));
+        people.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/week02/people.yaml"));
 
         // Find oldest person
         Person oldest = findOldestPerson(people);
@@ -195,8 +195,8 @@ public class PeopleTests {
     public void testFindYoungestPerson() throws IOException {
         // Load all people from both sources
         List<Person> people = new ArrayList<>();
-        people.addAll(CSVReader.readPersonsFromCSV("src/test/resources/lesson02/people.csv"));
-        people.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/lesson02/people.yaml"));
+        people.addAll(CSVReader.readPersonsFromCSV("src/test/resources/week02/people.csv"));
+        people.addAll(YAMLReader.readPersonsFromYAML("src/test/resources/week02/people.yaml"));
 
         // Find youngest person
         Person youngest = findYoungestPerson(people);

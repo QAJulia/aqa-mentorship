@@ -2,7 +2,7 @@
 
 ## Learning Objectives
 
-By the end of this lesson, you will:
+By the end of this week, you will:
 1. Master `testng.xml` structure and configuration
 2. Understand how to pass parameters from XML to tests
 3. Load test data from external sources (CSV, YAML)
@@ -38,7 +38,7 @@ smoke-suite.xml
             </run>
         </groups>
         <classes>
-            <class name="lesson02.PeopleTests"/>
+            <class name="week02.PeopleTests"/>
         </classes>
     </test>
 </suite>
@@ -297,7 +297,7 @@ public class YAMLReader {
 ```java
 @DataProvider(name = "peopleFromCSV")
 public Object[][] getPeopleFromCSV() throws IOException {
-    List<Person> persons = CSVReader.readPersonsFromCSV("src/test/resources/lesson02/people.csv");
+    List<Person> persons = CSVReader.readPersonsFromCSV("src/test/resources/week02/people.csv");
     Object[][] data = new Object[persons.size()][1];
     for (int i = 0; i < persons.size(); i++) {
         data[i][0] = persons.get(i);
@@ -318,8 +318,8 @@ public void testPeopleFromCSV(Person person) {
 ```java
 @DataProvider(name = "combinedPeopleData")
 public Object[][] getCombinedPeopleData() throws IOException {
-    List<Person> csvPersons = CSVReader.readPersonsFromCSV("src/test/resources/lesson02/people.csv");
-    List<Person> yamlPersons = YAMLReader.readPersonsFromYAML("src/test/resources/lesson02/people.yaml");
+    List<Person> csvPersons = CSVReader.readPersonsFromCSV("src/test/resources/week02/people.csv");
+    List<Person> yamlPersons = YAMLReader.readPersonsFromYAML("src/test/resources/week02/people.yaml");
     
     List<Person> allPersons = new ArrayList<>();
     allPersons.addAll(csvPersons);

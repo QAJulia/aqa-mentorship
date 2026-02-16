@@ -1,6 +1,6 @@
 # Java AQA Mentorship Program – 3‑Month Plan
 
-Lessons are scheduled **once per week**. Each week consists of:
+Calls are scheduled **once per week**. Each week consists of:
 - 1 hour live session (theory + live coding)
 - Homework with code review
 - Gradual evolution of a single automation framework (API + UI)
@@ -26,11 +26,11 @@ Lessons are scheduled **once per week**. Each week consists of:
 **Deliverables**
 - `StringValidator` class with basic methods
 - `StringValidatorTest` with DataProviders and all key TestNG hooks
-- `NOTES.md` and `TASKS.md` documenting lesson and homework
+- `NOTES.md` and `TASKS.md` documenting a class and homework
 
 ---
 
-### Week 2 – testng.xml, Parameters, External Data
+### Week 2 – testng.xml, Parameters, External Data, Lombok
 
 **Goals**
 - Configure and run tests using `testng.xml`
@@ -79,7 +79,7 @@ Lessons are scheduled **once per week**. Each week consists of:
 
 ---
 
-### Week 4 – API Testing: REST & SOAP, POJOs, Lombok
+### Week 4 – API Testing: REST & SOAP, POJOs
 
 **Goals**
 - Write API tests using Rest Assured

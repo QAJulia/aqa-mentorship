@@ -76,7 +76,7 @@
 <!--                <version>3.1.0</version>-->
 <!--                <configuration>-->
 <!--                    <suiteXmlFiles>-->
-<!--                        <suiteXmlFile>src/test/resources/lesson02/testng.xml</suiteXmlFile>-->
+<!--                        <suiteXmlFile>src/test/resources/week02/testng.xml</suiteXmlFile>-->
 <!--                    </suiteXmlFiles>-->
 <!--                </configuration>-->
 <!--            </plugin>-->
@@ -88,7 +88,7 @@
                 <version>3.1.0</version>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/lesson02/${suiteName}</suiteXmlFile>
+                        <suiteXmlFile>src/test/resources/week02/${suiteName}</suiteXmlFile>
                     </suiteXmlFiles>
                 </configuration>
             </plugin>

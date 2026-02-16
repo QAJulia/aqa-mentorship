@@ -56,11 +56,11 @@ java-aqa-mentorship/
 ├── src/
 │   ├── main/
 │   │   └── java/
-│   │       └── com/lesson01/
+│   │       └── com/week01/
 │   │           └── StringValidator.java    # Production code
 │   └── test/
 │       └── java/
-│           └── com/lesson01/
+│           └── com/week01/
 │               └── StringValidatorTest.java # Test code
 │               └── DataProviderTest.java # Test code
 ├── pom.xml                                   # Maven configuration
@@ -350,7 +350,7 @@ public void testPalindromeCheck() {
 ### Official Documentation
 - [TestNG Official Documentation](https://testng.org/)
 - [Maven in 5 Minutes](https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html)
-- [Maven Surefire Plugin](https://maven.apache.org/surefire/maven-surefire-plugin/) (for lesson 2)
+- [Maven Surefire Plugin](https://maven.apache.org/surefire/maven-surefire-plugin/) (for week 2)
 
 ### Tutorials
 - [TestNG Tutorial - RUS](https://www.youtube.com/watch?v=xx0CYt03_bc)
