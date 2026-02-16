@@ -1,9 +1,18 @@
 # Week 3: Allure Reporting & TestNG Listeners
 
+## What are TestNG Listeners?
+Listeners are hooks that let you react to test life‑cycle events (start, success, failure, skip, suite start/end).
+Instead of putting logging and reporting code inside every test, you centralize it in listener classes that TestNG calls automatically.
+Typical uses: log test statuses to console, take screenshots on failure (for UI), collect statistics, or send extra data to reporting tools like Allure.
+
+## What is Allure?
+Allure is a test reporting framework that turns raw test results into a readable, interactive HTML report.
+It shows business‑level structure (Epics, Features, Stories), detailed steps, attachments, and failure reasons for each test.
+By adding Allure annotations and steps in your tests, you get a report that is understandable both for QA engineers and non‑technical stakeholders.
+
 ## Learning Objectives
 
-By the end of this 
-lesson, you will:
+By the end of this lesson, you will:
 1. Add Allure reporting to your project
 2. Use Allure annotations (@Epic, @Feature, @Story, @Severity, @Step)
 3. Create TestNG listeners (ITestListener, ISuiteListener)
@@ -32,7 +41,8 @@ java-aqa-mentorship/
 │       │   ├── AllurePeopleTests.java
 │       │   └── PeopleTests.java
 │       └── resources/week03/
-│           ├── testng.xml
+│           └── testSuites/
+│               ├── testng.xml
 │           └── testData/
 │               ├── people.csv
 │               └── people.yaml
