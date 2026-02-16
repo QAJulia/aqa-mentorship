@@ -1,44 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suite name="Week 2 - External Data and DataProviders" verbose="2">
+<suite name="Week 2 - External Data and DataProviders" verbose="2" parallel="methods" thread-count="2">
 
-    <!-- ============================================
-         SMOKE TEST SUITE
-         Quick validation tests for rapid feedback
-         ============================================ -->
-    <test name="Smoke Tests">
-        <groups>
-            <run>
-                <include name="smoke"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="lesson02.PeopleTests"/>
-        </classes>
-    </test>
-
-    <!-- ============================================
-         REGRESSION TEST SUITE
-         Comprehensive tests for data processing logic
-         ============================================ -->
-    <test name="Regression Tests">
-        <groups>
-            <run>
-                <include name="regression"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="lesson02.PeopleTests"/>
-        </classes>
-    </test>
-
-    <!-- ============================================
-         FULL TEST SUITE
-         All tests (smoke + regression)
-         ============================================ -->
-    <test name="Full Test Suite">
+    <test name="People Tests">
         <classes>
             <class name="lesson02.PeopleTests"/>
         </classes>
     </test>
 
 </suite>
+
+<!-- mvn test -Dgroups=smoke -->

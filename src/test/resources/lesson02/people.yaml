@@ -1,13 +1,13 @@
 people:
-  - name: Robert Plant
-    age: 77
-    email: robert.plant@example.com
-  - name: Jimmy Page
-    age: 82
-    email: jimmy.page@example.com
-  - name: John Paul Jones
-    age: 80
-    email: john.paul.jones@example.com
-  - name: John Bonham
-    age: 32
-    email: john.bonham@example.com
+  - name: James Hetfield
+    age: 62
+    email: james.hetfield@example.com
+  - name: Lars Ulrich
+    age: 62
+    email: lars.ulrich@example.com
+  - name: Kirk Hammett
+    age: 63
+    email: kirk.hammett@example.com
+  - name: Robert Trujillo
+    age: 61
+    email: robert.trujillo@example.com
