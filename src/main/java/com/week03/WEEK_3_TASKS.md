@@ -5,7 +5,7 @@ Test a product discount calculation system using TestNG, Allure reporting, and c
 Practice positive/negative testing with detailed Allure steps and attachments.
 
 ## Pay attention
-This is your 1st output project in this program. It must sum up all knowledge you got from weeks 1-3. 
+This is your 1st output project in this program, create a fresh repo for it. It must sum up all knowledge you got from weeks 1-3. 
 You will have to use your knowledge in testng (pom, tests, xml, before/after hooks), listeners, 
 allure reporting, data providers. What will be important and discussed in a feedback:
 1. Project Structure - appropriate folder structure, files and classes naming

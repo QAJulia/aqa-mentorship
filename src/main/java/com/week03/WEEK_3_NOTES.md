@@ -22,8 +22,6 @@ By the end of this lesson, you will:
 
 ## 1. Project Structure
 
-Based on your current setup:
-
 ```
 java-aqa-mentorship/
 ├── src/
@@ -77,7 +75,7 @@ Replace your existing `maven-surefire-plugin` with:
     <version>3.1.2</version>
     <configuration>
         <suiteXmlFiles>
-            <suiteXmlFile>src/test/resources/week03/testng.xml</suiteXmlFile>
+            <suiteXmlFile>src/test/resources/week03/testSuites/testng.xml</suiteXmlFile>
         </suiteXmlFiles>
         <argLine>
             -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/1.9.20.1/aspectjweaver-1.9.20.1.jar"
