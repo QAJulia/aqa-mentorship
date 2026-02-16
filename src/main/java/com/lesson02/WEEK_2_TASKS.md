@@ -55,8 +55,11 @@ This homework reinforces concepts from Week 2:
 
 ## Task 3: Data Processing Logic
 
+Steps from this Task must be created in your repo. Try to implement methods yourself, if it doesn't work - 
+you can find solution in this repo and copy it.
+
 **What you need to do:**
-1. Open the test class: `src/test/java/lesson02/PeopleTests.java`
+1. In your repo create the test class: `src/test/java/lesson02/PeopleTests.java`
 2. Implement the following private static methods in the test class (or in a helper class):
 
 ### 3a. Calculate Average Age
@@ -259,7 +262,7 @@ mvn test -DsuiteXmlFile=testng.xml
 
 ---
 
-## Bonus Challenges
+## Individual challenges
 
 ### Challenge 1: Sorting
 Add a test that sorts all people by age (ascending and descending) and verify the first/last person.

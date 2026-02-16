@@ -24,17 +24,48 @@ By the end of this lesson, you will:
 - Control parallel execution
 - Configure listeners
 
-### 1.2 Basic Structure
+### 1.2 Multiple Suite Strategy
+Create separate suite files to avoid test duplication:
+smoke-suite.xml
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<suite name="My Suite" thread-count="1" parallel="false">
-    <test name="My Test">
+<suite name="Smoke Suite" verbose="2">
+    <test name="Smoke Tests">
+        <groups>
+            <run>
+                <include name="smoke"/>
+            </run>
+        </groups>
         <classes>
-            <class name="com.example.MyTest"/>
+            <class name="lesson02.PeopleTests"/>
         </classes>
     </test>
 </suite>
+```
+
+### 1.3 Dynamic Suite Selection
+#### pom.xml configuration:
+
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>3.1.0</version>
+    <configuration>
+        <suiteXmlFiles>
+            <suiteXmlFile>src/test/resources/${suite.name}</suiteXmlFile>
+        </suiteXmlFiles>
+    </configuration>
+</plugin>
+```
+#### Mvn commands:
+```bash
+mvn test -Dsuite.name=smoke-suite.xml
+
+mvn test -Dsuite.name=regression-suite.xml
+
+mvn test -Dsuite.name=testng.xml
 ```
 
 **Key Elements:**
