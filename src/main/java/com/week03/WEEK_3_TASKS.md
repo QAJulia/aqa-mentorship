@@ -37,7 +37,7 @@ Create a Product model with fields: int id, String name, double price, String ca
 ### 1.2 Discount Model
 
 **Location:** `src/main/java/com/week03/models/Discount.java`
-Create a Discount model with fields: double value, String description, enum DiscountType type
+Create a Discount model with fields: double value, String description, enum DiscountType type (FIXED or PERCENTAGE)
 
 ### 1.3 DiscountResult Model
 
