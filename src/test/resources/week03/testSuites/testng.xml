@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="Week 3 - Allure Reporting and TestNG Listeners">
+
+    <!-- Register custom listeners -->
+    <listeners>
+        <listener class-name="com.week03.listeners.CustomTestListener"/>
+        <listener class-name="com.week03.listeners.SuiteListener"/>
+    </listeners>
+
+    <test name="People Tests">
+        <classes>
+            <class name="week03.AllurePeopleTests"/>
+        </classes>
+    </test>
+
+</suite>
+
+<!-- mvn test -Dgroups=smoke -->
