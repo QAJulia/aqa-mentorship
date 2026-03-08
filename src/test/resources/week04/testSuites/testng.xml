@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="Week 3 - Allure Reporting and TestNG Listeners">
+
+    <test name="People Tests">
+        <classes>
+            <class name="week04.PetApiTest"/>
+        </classes>
+    </test>
+
+</suite>
