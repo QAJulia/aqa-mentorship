@@ -1,0 +1,38 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+    Week 5 — UI Test Suite
+    Run from CLI:  mvn test -DsuiteXmlFile=src/test/resources/testng-ui.xml
+    Run from IDE:  right-click this file → Run
+-->
+<suite name="UI Tests – Week 5" verbose="1">
+
+    <test name="Login Tests">
+        <classes>
+            <class name="ui.LoginTest"/>
+        </classes>
+    </test>
+
+    <test name="Checkbox Tests">
+        <classes>
+            <class name="ui.CheckboxTest"/>
+        </classes>
+    </test>
+
+    <test name="Dynamic Loading Tests">
+        <classes>
+            <class name="ui.DynamicLoadingTest"/>
+        </classes>
+    </test>
+
+    <!--
+        HOMEWORK: after completing bonus task, uncomment this block:
+
+    <test name="Broken Images Tests">
+        <classes>
+            <class name="com.mentorship.ui.BrokenImagesTest"/>
+        </classes>
+    </test>
+    -->
+
+</suite>

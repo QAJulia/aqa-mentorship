@@ -2,32 +2,31 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-         http://maven.apache.org/maven-v4_0_0.xsd">
+             http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
-    <artifactId>java-aqa-mentorship</artifactId>
+    <groupId>com.mentorship</groupId>
+    <artifactId>aqa-course</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>Java AQA Mentorship Program</name>
-    <url>http://maven.apache.org</url>
+    <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Dependency versions -->
-        <testng.version>7.8.0</testng.version>
-        <lombok.version>1.18.30</lombok.version>
-        <jackson.version>2.16.1</jackson.version>
-        <snakeyaml.version>2.2</snakeyaml.version>
+        <testng.version>7.9.0</testng.version>
+        <selenium.version>4.20.0</selenium.version>
+        <webdrivermanager.version>5.8.0</webdrivermanager.version>
         <allure.version>2.25.0</allure.version>
-        <aspectj.version>1.9.20.1</aspectj.version>
-        <rest-assured.version>5.4.0</rest-assured.version>
+        <lombok.version>1.18.32</lombok.version>
+        <jackson.version>2.17.0</jackson.version>
     </properties>
 
     <dependencies>
-        <!-- TestNG -->
+
+        <!-- ===== TEST FRAMEWORK ===== -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -35,7 +34,36 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Lombok for reducing boilerplate -->
+        <!-- ===== SELENIUM ===== -->
+        <!--
+            selenium-java is the main Selenium dependency.
+            It includes bindings for Chrome, Firefox, Edge and all WebDriver interfaces.
+        -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+        <!--
+            WebDriverManager automatically downloads the correct ChromeDriver / GeckoDriver.
+            No need to manually manage driver executables.
+            Docs: https://github.com/bonigarcia/webdrivermanager
+        -->
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>${webdrivermanager.version}</version>
+        </dependency>
+
+        <!-- ===== ALLURE ===== -->
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-testng</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+
+        <!-- ===== LOMBOK ===== -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -43,96 +71,72 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- SnakeYAML for YAML parsing -->
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>2.0</version>
-        </dependency>
-
-        <!-- Jackson for JSON processing -->
+        <!-- ===== JACKSON (kept from Week 4 — reused for any JSON needs) ===== -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.15.2</version>
+            <version>${jackson.version}</version>
         </dependency>
 
-        <!-- Jackson YAML support -->
+        <!-- ===== LOGGING ===== -->
         <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.15.2</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.12</version>
         </dependency>
 
-        <!-- Allure TestNG Integration -->
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-testng</artifactId>
-            <version>2.25.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-java-commons</artifactId>
-            <version>2.25.0</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- Rest Assured -->
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>${rest-assured.version}</version>
-        </dependency>
-
-        <!-- Allure Rest Assured integration -->
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-rest-assured</artifactId>
-            <version>${allure.version}</version>
-        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Compiler Plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>15</source>
-                    <target>15</target>
-                </configuration>
-            </plugin>
 
-            <!-- Maven Surefire Plugin -->
+            <!-- Maven Surefire: runs TestNG tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.5</version>
                 <configuration>
+                    <!--
+                        Default suite file. Override from CLI:
+                        mvn test -DsuiteXmlFile=testng-ui.xml
+                    -->
                     <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/week05/testSuites/testng.xml</suiteXmlFile>
+                        <suiteXmlFile>${suiteXmlFile}</suiteXmlFile>
                     </suiteXmlFiles>
-                    <argLine> -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/1.9.20.1/aspectjweaver-1.9.20.1.jar" </argLine>
-                    <properties>
-                        <property>
-                            <name>usedefaultlisteners</name>
-                            <value>false</value>
-                        </property>
-                    </properties>
+                    <!-- Required for Allure to capture results -->
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/1.9.22/aspectjweaver-1.9.22.jar"
+                    </argLine>
+                    <systemPropertyVariables>
+                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                    </systemPropertyVariables>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.aspectj</groupId>
-                        <artifactId>aspectjweaver</artifactId>
-                        <version>1.9.20.1</version>
-                    </dependency>
-                </dependencies>
             </plugin>
 
+            <!-- AspectJ weaver — required by Allure -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-aspectjweaver</id>
+                        <phase>process-test-classes</phase>
+                        <goals><goal>copy</goal></goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.aspectj</groupId>
+                                    <artifactId>aspectjweaver</artifactId>
+                                    <version>1.9.22</version>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Allure Maven plugin: mvn allure:serve -->
             <plugin>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
@@ -141,5 +145,16 @@
 
         </plugins>
     </build>
+
+    <!-- Default value for suiteXmlFile property -->
+    <profiles>
+        <profile>
+            <id>default-suite</id>
+            <activation><activeByDefault>true</activeByDefault></activation>
+            <properties>
+                <suiteXmlFile>src/test/resources/testng-ui.xml</suiteXmlFile>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
