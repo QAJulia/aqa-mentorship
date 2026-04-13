@@ -1,4 +1,4 @@
-package com.week06.utils;
+package com.week07.utils;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;

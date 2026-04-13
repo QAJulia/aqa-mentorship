@@ -101,7 +101,7 @@
                         mvn test -DsuiteXmlFile=testng-ui.xml
                     -->
                     <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/testng-week6.xml</suiteXmlFile>
+                        <suiteXmlFile>src/test/resources/testng-week7.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <!-- Required for Allure to capture results -->
                     <argLine>
@@ -152,7 +152,7 @@
             <id>default-suite</id>
             <activation><activeByDefault>true</activeByDefault></activation>
             <properties>
-                <suiteXmlFile>src/test/resources/testng-ui.xml</suiteXmlFile>
+                <suiteXmlFile>src/test/resources/testng-week7.xml</suiteXmlFile>
             </properties>
         </profile>
     </profiles>

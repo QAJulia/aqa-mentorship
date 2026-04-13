@@ -1,4 +1,4 @@
-package com.week06.base;
+package com.week07.base;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;

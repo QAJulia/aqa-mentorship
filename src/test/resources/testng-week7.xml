@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="Week 7 – UI Test Architecture and Patterns" verbose="1" parallel="none">
+
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
+    <!-- ===================================================================
+         Smoke – critical path only, all styles
+         =================================================================== -->
+    <test name="Smoke">
+        <classes>
+            <class name="ui.FluentLoginTest"/>
+            <class name="ui.LoginFactoryTest"/>
+            <class name="ui.ScreenStateTest"/>
+        </classes>
+    </test>
+
+    <!-- ===================================================================
+         Fluent Page Object tests
+         =================================================================== -->
+    <test name="Fluent Page Object">
+        <classes>
+            <class name="ui.FluentLoginTest"/>
+        </classes>
+    </test>
+
+    <!-- ===================================================================
+         Page Factory tests
+         =================================================================== -->
+    <test name="Page Factory">
+        <classes>
+            <class name="ui.LoginFactoryTest"/>
+        </classes>
+    </test>
+
+    <!-- ===================================================================
+         Screen / State Object tests
+         =================================================================== -->
+    <test name="Screen State">
+        <classes>
+            <class name="ui.ScreenStateTest"/>
+        </classes>
+    </test>
+
+    <!-- ===================================================================
+         Anti-Patterns (educational – shows bad vs good)
+         =================================================================== -->
+    <test name="Anti-Patterns Showcase">
+        <classes>
+            <class name="ui.AntiPatternsTest"/>
+        </classes>
+    </test>
+
+</suite>
