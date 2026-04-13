@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  logback.xml – Logback configuration for the Week 9 framework.
+
+  Why Logback instead of slf4j-simple?
+    - Supports log levels per package (e.g. DEBUG for org.example, WARN for Selenide internals)
+    - Outputs coloured console messages for readability
+    - Can write to a rolling file in CI pipelines
+    - AllureSelenide and allure-rest-assured integrate through SLF4J → Logback
+
+  Override log level at runtime:
+    mvn test -Dlogback.configurationFile=path/to/custom-logback.xml
+-->
+<configuration>
+
+    <!-- Console appender with timestamp, level, class name, and message -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Rolling file appender – writes to target/logs/test.log -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>target/logs/test.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>target/logs/test.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Our framework code: DEBUG level (verbose during development) -->
+    <logger name="org.example" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- Suppress noisy Selenide / WebDriver internals -->
+    <logger name="com.codeborne.selenide" level="WARN"/>
+    <logger name="org.openqa.selenium"    level="WARN"/>
+    <logger name="io.github.bonigarcia"   level="WARN"/>
+
+    <!-- REST Assured – suppress verbose request/response headers in console -->
+    <logger name="io.restassured"         level="WARN"/>
+
+    <!-- Root: INFO for everything else -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>

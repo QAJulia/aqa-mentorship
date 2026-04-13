@@ -121,7 +121,7 @@ Calls are scheduled **once per week**. Each week consists of:
 - Navigation, basic waits (implicit and introduction to explicit waits)
 - Locators: id, name, className, cssSelector, basic xpath
 - Simple end‑to‑end scenario on a demo web app
-- Basic `BaseUiTest` abstraction
+- Basic `base.BaseUiTest` abstraction
 
 **Deliverables**
 - WebDriver setup controlled via configuration (URL, browser)
@@ -212,7 +212,7 @@ Calls are scheduled **once per week**. Each week consists of:
 **Topics**
 - Final project layout for API + UI modules/packages
 - Base classes:
-    - `BaseTest`, `BaseApiTest`, `BaseUiTest`
+    - `base.BaseTest`, `base.BaseApiTest`, `base.BaseUiTest`
 - Shared utilities:
     - Configuration management (properties/typed config)
     - Logging setup

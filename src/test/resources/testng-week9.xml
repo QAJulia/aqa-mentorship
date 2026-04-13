@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="Week 9 – Unified API + UI Framework" verbose="1" parallel="none">
+
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
+    <!-- ── API Tests ──────────────────────────────────────────────────── -->
+    <test name="API Tests">
+        <classes>
+            <class name="api.BooksApiTest"/>
+        </classes>
+    </test>
+
+    <!-- ── UI Tests ───────────────────────────────────────────────────── -->
+    <test name="UI Tests">
+        <classes>
+            <class name="ui.BookStoreUiTest"/>
+        </classes>
+    </test>
+
+    <!-- ── Unified Tests ──────────────────────────────────────────────── -->
+    <test name="Unified Tests (API + UI)">
+        <classes>
+            <class name="unified.BookStoreSyncTest"/>
+        </classes>
+    </test>
+
+</suite>
