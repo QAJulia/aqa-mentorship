@@ -101,7 +101,7 @@
                         mvn test -DsuiteXmlFile=testng-ui.xml
                     -->
                     <suiteXmlFiles>
-                        <suiteXmlFile>${suiteXmlFile}</suiteXmlFile>
+                        <suiteXmlFile>src/test/resources/testng-week6.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <!-- Required for Allure to capture results -->
                     <argLine>

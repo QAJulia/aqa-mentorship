@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<!--
+  testng-week6.xml – Week 6 Test Suite
+  ======================================
+  Structure:
+    - Suite contains two test groups: smoke and regression
+    - Each group runs the same page classes but with different test priorities
+    - Allure listener is registered here for automatic report generation
+
+  Run:
+    mvn clean test                          → full suite
+    mvn clean test -Dgroups=smoke           → smoke tests only
+    mvn clean test -Dtest=TablesPageTest    → single class
+-->
+<suite name="Week 6 – Advanced XPath and Page Object Model" verbose="1" parallel="none">
+
+    <!-- Register Allure TestNG listener so results are written to target/allure-results -->
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
+    <!-- ===================================================================
+         Smoke suite – fast, critical path tests only
+         =================================================================== -->
+    <test name="Smoke Tests">
+        <groups>
+            <run>
+                <include name="smoke"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="ui.LoginPageTest"/>
+            <class name="ui.CheckboxesPageTest"/>
+            <class name="ui.TablesPageTest"/>
+            <class name="ui.DropdownPageTest"/>
+        </classes>
+    </test>
+
+    <!-- ===================================================================
+         Regression suite – all tests
+         =================================================================== -->
+    <test name="Regression Tests">
+        <groups>
+            <run>
+                <include name="regression"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="ui.LoginPageTest"/>
+            <class name="ui.CheckboxesPageTest"/>
+            <class name="ui.TablesPageTest"/>
+            <class name="ui.DropdownPageTest"/>
+        </classes>
+    </test>
+
+</suite>
