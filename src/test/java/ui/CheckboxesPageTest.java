@@ -7,14 +7,14 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 /**
- * CheckboxesPageTest – tests for https://the-internet.herokuapp.com/checkboxes
+ * CheckboxesPageTest – Selenide version (Week 8).
  *
- * Demonstrates:
- *  - Page Object interaction without any direct driver calls in tests
- *  - Testing initial state vs. after-action state
- *  - Using positional XPath and descendant axis through the page class
+ * MIGRATION from Week 6:
+ *   - new CheckboxesPage(driver).open(BASE_URL)  →  new CheckboxesPage().open()
+ *   - assertFalse(page.isFirstChecked())         →  same (boolean query delegating to Selenide)
+ *   - assertEquals(page.getCheckedCount(), ...)  →  page.assertTotalCount(N) uses shouldHave(size)
  */
-@Epic("Week 6 – Page Object Model")
+@Epic("Week 8 – Selenide")
 @Feature("Checkboxes Page")
 public class CheckboxesPageTest extends BaseTest {
 
@@ -22,23 +22,16 @@ public class CheckboxesPageTest extends BaseTest {
           groups = {"smoke", "checkboxes"})
     @Story("Page content")
     @Severity(SeverityLevel.NORMAL)
-    @Description("Open the checkboxes page and verify that exactly two checkboxes are present.")
     public void pageHasTwoCheckboxes() {
-        CheckboxesPage page = new CheckboxesPage(driver).open(BASE_URL);
-
-        assertEquals(page.getTotalCheckboxCount(), 2,
-                "Expected 2 checkboxes on the page");
+        new CheckboxesPage().open().assertTotalCount(2);
     }
 
     @Test(description = "First checkbox is initially unchecked",
           groups = {"smoke", "checkboxes"})
     @Story("Initial state")
     @Severity(SeverityLevel.NORMAL)
-    @Description("Verify the initial state of the first checkbox using positional XPath.")
     public void firstCheckboxInitiallyUnchecked() {
-        CheckboxesPage page = new CheckboxesPage(driver).open(BASE_URL);
-
-        assertFalse(page.isFirstChecked(),
+        assertFalse(new CheckboxesPage().open().isFirstChecked(),
                 "First checkbox should be unchecked by default");
     }
 
@@ -46,11 +39,8 @@ public class CheckboxesPageTest extends BaseTest {
           groups = {"smoke", "checkboxes"})
     @Story("Initial state")
     @Severity(SeverityLevel.NORMAL)
-    @Description("Verify the initial state of the last checkbox.")
     public void lastCheckboxInitiallyChecked() {
-        CheckboxesPage page = new CheckboxesPage(driver).open(BASE_URL);
-
-        assertTrue(page.isLastChecked(),
+        assertTrue(new CheckboxesPage().open().isLastChecked(),
                 "Last checkbox should be checked by default");
     }
 
@@ -58,54 +48,43 @@ public class CheckboxesPageTest extends BaseTest {
           groups = {"regression", "checkboxes"})
     @Story("User interaction")
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Click the first checkbox and verify it becomes checked.")
+    @Description("setSelected(true) replaces the conditional click from Week 6.")
     public void checkFirstCheckbox() {
-        CheckboxesPage page = new CheckboxesPage(driver).open(BASE_URL);
-
-        page.checkFirst();
-
-        assertTrue(page.isFirstChecked(),
-                "First checkbox should be checked after clicking");
+        // assertFirstIsChecked() uses $(By).shouldBe(checked) — auto-wait
+        new CheckboxesPage()
+                .open()
+                .checkFirst()
+                .assertFirstIsChecked();
     }
 
     @Test(description = "Unchecking the last checkbox makes it deselected",
           groups = {"regression", "checkboxes"})
     @Story("User interaction")
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Click the last checkbox (already checked) and verify it becomes unchecked.")
     public void uncheckLastCheckbox() {
-        CheckboxesPage page = new CheckboxesPage(driver).open(BASE_URL);
-
+        CheckboxesPage page = new CheckboxesPage().open();
         page.uncheckLast();
-
-        assertFalse(page.isLastChecked(),
-                "Last checkbox should be unchecked after clicking");
+        assertFalse(page.isLastChecked(), "Last checkbox should be unchecked after click");
     }
 
     @Test(description = "checkAll() selects both checkboxes",
           groups = {"regression", "checkboxes"})
     @Story("Bulk actions")
     @Severity(SeverityLevel.NORMAL)
-    @Description("Use checkAll() helper and verify all checkboxes become selected.")
     public void checkAllSelectsAll() {
-        CheckboxesPage page = new CheckboxesPage(driver).open(BASE_URL);
-
+        CheckboxesPage page = new CheckboxesPage().open();
         page.checkAll();
-
         assertEquals(page.getCheckedCount(), page.getTotalCheckboxCount(),
-                "All checkboxes should be checked after checkAll()");
+                "All checkboxes should be checked");
     }
 
     @Test(description = "uncheckAll() deselects both checkboxes",
           groups = {"regression", "checkboxes"})
     @Story("Bulk actions")
     @Severity(SeverityLevel.NORMAL)
-    @Description("Use uncheckAll() helper and verify no checkbox is selected.")
     public void uncheckAllDeselectsAll() {
-        CheckboxesPage page = new CheckboxesPage(driver).open(BASE_URL);
-
+        CheckboxesPage page = new CheckboxesPage().open();
         page.uncheckAll();
-
         assertEquals(page.getCheckedCount(), 0,
                 "No checkboxes should be checked after uncheckAll()");
     }

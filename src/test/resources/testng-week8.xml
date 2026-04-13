@@ -1,26 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
-<!--
-  testng-week6.xml – Week 6 Test Suite
-  ======================================
-  Structure:
-    - Suite contains two test groups: smoke and regression
-    - Each group runs the same page classes but with different test priorities
-    - Allure listener is registered here for automatic report generation
+<suite name="Week 8 – Selenide" verbose="1" parallel="none">
 
-  Run:
-    mvn clean test                          → full suite
-    mvn clean test -Dgroups=smoke           → smoke tests only
-    mvn clean test -Dtest=TablesPageTest    → single class
--->
-<suite name="Week 6 – Advanced XPath and Page Object Model" verbose="1" parallel="none">
-
-    <!-- Register Allure TestNG listener so results are written to target/allure-results -->
+    <!-- Allure TestNG listener – required for report generation -->
     <listeners>
         <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
     </listeners>
 
+    <!-- ===================================================================
+         Smoke – critical path tests
+         =================================================================== -->
     <test name="Smoke Tests">
         <classes>
             <class name="ui.LoginPageTest"/>
@@ -30,6 +20,9 @@
         </classes>
     </test>
 
+    <!-- ===================================================================
+         Regression – all tests
+         =================================================================== -->
     <test name="Regression Tests">
         <classes>
             <class name="ui.LoginPageTest"/>

@@ -1,80 +1,72 @@
 package ui;
 
-import com.week06.utils.DriverFactory;
-import io.qameta.allure.Allure;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.testng.ITestResult;
+import com.codeborne.selenide.Selenide;
+import com.week06.utils.SelenideConfig;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-
-import java.io.ByteArrayInputStream;
+import org.testng.annotations.BeforeSuite;
 
 /**
- * BaseTest – TestNG lifecycle base class for all Week 6 UI tests.
+ * BaseTest – Selenide version (Week 8).
  *
- * Responsibilities:
- *  - Create a new WebDriver instance before each test method (@BeforeMethod)
- *  - Navigate to the base URL
- *  - Capture a screenshot and attach it to the Allure report on failure
- *  - Close the driver after each test method (@AfterMethod)
+ * MIGRATION from Week 6:
  *
- * Using @BeforeMethod (not @BeforeClass) ensures full test isolation:
- * each test runs in its own browser session.
+ *   Week 6 BaseTest had:
+ *     @BeforeMethod: WebDriver driver = DriverFactory.createDriver()
+ *     @AfterMethod:  driver.quit() + manual TakesScreenshot
  *
- * All concrete test classes extend BaseTest and receive 'driver' and 'BASE_URL'.
+ *   Week 8 BaseTest has:
+ *     @BeforeSuite:  SelenideConfig.init()  — configure once, register AllureSelenide
+ *     @BeforeMethod: nothing — Selenide creates the browser on the first open() call
+ *     @AfterMethod:  Selenide.closeWebDriver() — Selenide handles driver.quit() internally
+ *
+ * KEY DIFFERENCES:
+ *
+ *  1. No 'protected WebDriver driver' field — tests and pages never hold a driver reference.
+ *     They call $(), $$(), open() as static methods from Selenide.
+ *
+ *  2. No manual screenshot code — AllureSelenide listener (registered in SelenideConfig)
+ *     attaches a PNG to the Allure report automatically on every test failure.
+ *
+ *  3. BASE_URL is not a constant here — it is set in SelenideConfig.Configuration.baseUrl,
+ *     so page classes use open("/login") shorthand without knowing the host.
  */
 public abstract class BaseTest {
 
-    protected WebDriver driver;
-
-    /** Base URL for all the-internet tests. Override in subclass if needed. */
-    protected static final String BASE_URL = "https://the-internet.herokuapp.com";
-
-    // =========================================================================
-    // TestNG lifecycle
-    // =========================================================================
+    /**
+     * Runs once before the entire suite.
+     * Configures Selenide (browser, timeout, baseUrl) and registers AllureSelenide.
+     * Must run before any open() or $() call.
+     */
+    @BeforeSuite(alwaysRun = true)
+    public void globalSetUp() {
+        SelenideConfig.init();
+    }
 
     /**
      * Runs before each @Test method.
-     * Creates a fresh browser and navigates to the home page.
+     * In Selenide there is nothing to do here — the browser is opened lazily
+     * by the first open() call inside the page object.
+     *
+     * Kept as a hook in case a subclass needs per-test setup (e.g. login state).
      */
     @BeforeMethod(alwaysRun = true)
     public void setUp() {
-        driver = DriverFactory.createDriver();
+        // Browser is created lazily by Selenide on the first open() call.
+        // No driver initialisation needed here.
     }
 
     /**
      * Runs after each @Test method.
-     *  - On FAILURE: attaches a screenshot to the Allure report
-     *  - Always: closes the browser
+     * Closes the browser. Selenide internally calls driver.quit().
+     * Screenshots on failure are handled automatically by AllureSelenide.
+     *
+     * Week 6 equivalent:
+     *   if (result.getStatus() == FAILURE) attachScreenshot(...)
+     *   driver.quit()
      */
     @AfterMethod(alwaysRun = true)
-    public void tearDown(ITestResult result) {
-        if (result.getStatus() == ITestResult.FAILURE) {
-            attachScreenshot("Screenshot on failure – " + result.getName());
-        }
-        if (driver != null) {
-            driver.quit();
-        }
-    }
-
-    // =========================================================================
-    // Helpers available to all subclasses
-    // =========================================================================
-
-    /**
-     * Takes a PNG screenshot and attaches it to the current Allure report step.
-     *
-     * @param name the attachment label shown in the report
-     */
-    protected void attachScreenshot(String name) {
-        try {
-            byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-            Allure.addAttachment(name, "image/png", new ByteArrayInputStream(screenshot), "png");
-        } catch (Exception e) {
-            // Driver may already be closed; swallow to avoid masking the real failure
-        }
+    public void tearDown() {
+        Selenide.closeWebDriver();
     }
 }

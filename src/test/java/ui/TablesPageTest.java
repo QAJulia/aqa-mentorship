@@ -10,15 +10,18 @@ import java.util.List;
 import static org.testng.Assert.*;
 
 /**
- * TablesPageTest – tests for https://the-internet.herokuapp.com/tables
+ * TablesPageTest – Selenide version (Week 8).
  *
- * The most XPath-heavy set of tests in Week 6:
- *  - Row selection by cell text
- *  - Column data retrieval via following-sibling axis
- *  - ancestor axis to navigate from cell → row → action link
- *  - normalize-space() for whitespace-tolerant matching
+ * MIGRATION from Week 6:
+ *   - new TablesPage(driver).open(BASE_URL)  →  new TablesPage().open()
+ *   - getTable1Headers() now calls $$(By).texts() internally — same List<String> returned
+ *   - getRowCellsByLastName() uses row.$$(tagName).texts() instead of stream().map()
+ *   - assertRowCount() uses shouldHave(CollectionCondition.size(N))
+ *   - assertEmailForRow() uses shouldHave(exactText(...))
+ *
+ * Test method bodies are identical to Week 6 — only page construction changed.
  */
-@Epic("Week 6 – Page Object Model")
+@Epic("Week 8 – Selenide")
 @Feature("Tables Page")
 public class TablesPageTest extends BaseTest {
 
@@ -26,69 +29,51 @@ public class TablesPageTest extends BaseTest {
           groups = {"smoke", "tables"})
     @Story("Table structure")
     @Severity(SeverityLevel.NORMAL)
-    @Description("Verify that Table 1 has the correct column headers in order.")
     public void tableHeadersAreCorrect() {
-        TablesPage page = new TablesPage(driver).open(BASE_URL);
+        List<String> headers = new TablesPage().open().getTable1Headers();
 
-        List<String> headers = page.getTable1Headers();
-        List<String> expected = Arrays.asList(
+        assertEquals(headers, Arrays.asList(
                 "Last Name", "First Name", "Email", "Due", "Web Site", "Action"
-        );
-
-        assertEquals(headers, expected,
-                "Table 1 headers do not match expected values");
+        ));
     }
 
     @Test(description = "Table 1 contains exactly 4 data rows",
           groups = {"smoke", "tables"})
     @Story("Table structure")
     @Severity(SeverityLevel.NORMAL)
-    @Description("Verify the row count in Table 1 tbody.")
     public void tableHasFourRows() {
-        TablesPage page = new TablesPage(driver).open(BASE_URL);
-
-        assertEquals(page.getTable1RowCount(), 4,
-                "Table 1 should have 4 data rows");
+        // assertRowCount uses shouldHave(CollectionCondition.size(4)) — cleaner failure msg
+        new TablesPage().open().assertRowCount(4);
     }
 
     @Test(description = "Row with last name 'Smith' exists in Table 1",
           groups = {"smoke", "tables"})
     @Story("Row lookup by cell value")
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Use XPath predicate to find a row by last name using normalize-space().")
     public void rowWithSmithExists() {
-        TablesPage page = new TablesPage(driver).open(BASE_URL);
-
-        assertTrue(page.hasRowWithLastName("Smith"),
+        assertTrue(new TablesPage().open().hasRowWithLastName("Smith"),
                 "Expected a row with last name 'Smith'");
     }
 
-    @Test(description = "Email for 'Smith' is retrieved via following-sibling axis",
+    @Test(description = "Email for 'Smith' retrieved via following-sibling axis",
           groups = {"regression", "tables"})
     @Story("Column value retrieval")
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Retrieve the email of the 'Smith' row using following-sibling XPath axis.")
+    @Description("Same XPath as Week 6; only the underlying call changed to Selenide getText().")
     public void emailForSmithIsCorrect() {
-        TablesPage page = new TablesPage(driver).open(BASE_URL);
-
-        String email = page.getEmailByLastName("Smith");
-        assertEquals(email, "jsmith@gmail.com",
-                "Email for Smith should be jsmith@gmail.com");
+        // assertEmailForRow uses $(By).shouldHave(exactText(...))
+        new TablesPage().open().assertEmailForRow("Smith", "jsmith@gmail.com");
     }
 
     @Test(description = "Full row data for 'Bach' contains expected values",
           groups = {"regression", "tables"})
     @Story("Row data validation")
     @Severity(SeverityLevel.NORMAL)
-    @Description("Retrieve all cells of the Bach row and assert each column's value.")
     public void fullRowForBachIsCorrect() {
-        TablesPage page = new TablesPage(driver).open(BASE_URL);
+        List<String> cells = new TablesPage().open().getRowCellsByLastName("Bach");
 
-        List<String> cells = page.getRowCellsByLastName("Bach");
-
-        // cells = [LastName, FirstName, Email, Due, Website, Action]
-        assertEquals(cells.get(0), "Bach",        "Last name column");
-        assertEquals(cells.get(1), "Frank",       "First name column");
+        assertEquals(cells.get(0), "Bach",              "Last name column");
+        assertEquals(cells.get(1), "Frank",             "First name column");
         assertEquals(cells.get(2), "fbach@hotmail.com", "Email column");
     }
 
@@ -96,28 +81,22 @@ public class TablesPageTest extends BaseTest {
           groups = {"regression", "tables"})
     @Story("Action links")
     @Severity(SeverityLevel.NORMAL)
-    @Description("Verify that the number of edit and delete links equals the number of rows.")
     public void eachRowHasEditAndDeleteLink() {
-        TablesPage page = new TablesPage(driver).open(BASE_URL);
-
+        TablesPage page = new TablesPage().open();
         int rows = page.getTable1RowCount();
-        assertEquals(page.getEditLinkCount(), rows,
-                "Edit link count should equal row count");
-        assertEquals(page.getDeleteLinkCount(), rows,
-                "Delete link count should equal row count");
+
+        assertEquals(page.getEditLinkCount(),   rows, "Edit link count should equal row count");
+        assertEquals(page.getDeleteLinkCount(), rows, "Delete link count should equal row count");
     }
 
-    @Test(description = "Clicking edit for 'Smith' does not throw an exception",
+    @Test(description = "Clicking edit for 'Smith' does not throw (ancestor-axis XPath check)",
           groups = {"regression", "tables"})
     @Story("Action links")
     @Severity(SeverityLevel.MINOR)
-    @Description("Click the edit link for the Smith row; verifies the ancestor-axis locator works.")
     public void clickEditForSmithDoesNotFail() {
-        TablesPage page = new TablesPage(driver).open(BASE_URL);
-        // This test mainly validates the ancestor-axis XPath does not throw
-        // The-internet edit link is just a hash href, so no navigation happens
+        TablesPage page = new TablesPage().open();
         page.clickEditFor("Smith");
-        assertTrue(driver.getCurrentUrl().contains("tables"),
-                "Should remain on the tables page after clicking edit");
+        assertTrue(page.getCurrentUrl().contains("tables"),
+                "Should remain on tables page");
     }
 }

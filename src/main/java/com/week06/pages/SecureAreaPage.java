@@ -2,35 +2,23 @@ package com.week06.pages;
 
 import com.week06.base.BasePage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
+
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selenide.$;
 
 /**
- * SecureAreaPage – Page Object for https://the-internet.herokuapp.com/secure
+ * SecureAreaPage – Selenide version (Week 8).
  *
- * Returned by LoginPage.clickLogin() after a successful authentication.
+ * MIGRATION from Week 6:
+ *   - Constructor no longer accepts WebDriver
+ *   - isFlashDisplayed() uses $(By).is(visible) instead of try/catch findElement
+ *   - assertWelcomeVisible() uses shouldBe(visible) — no TestNG assert needed
  */
 public class SecureAreaPage extends BasePage {
 
-    // =========================================================================
-    // Locators
-    // =========================================================================
-
-    // The "You logged in..." flash banner
     private final By flashMessage = By.xpath("//div[contains(@class,'flash')]");
-
-    // Page heading
-    private final By heading = By.xpath("//h2");
-
-    // Logout link – contains text "Logout"
-    private final By logoutLink = By.xpath("//a[contains(text(),'Logout')]");
-
-    // =========================================================================
-    // Constructor
-    // =========================================================================
-
-    public SecureAreaPage(WebDriver driver) {
-        super(driver);
-    }
+    private final By heading      = By.xpath("//h2");
+    private final By logoutLink   = By.xpath("//a[contains(text(),'Logout')]");
 
     // =========================================================================
     // Actions
@@ -38,7 +26,7 @@ public class SecureAreaPage extends BasePage {
 
     public LoginPage clickLogout() {
         clickWhenReady(logoutLink);
-        return new LoginPage(driver);
+        return new LoginPage();
     }
 
     // =========================================================================
@@ -55,5 +43,28 @@ public class SecureAreaPage extends BasePage {
 
     public String getHeadingText() {
         return getText(heading);
+    }
+
+    // =========================================================================
+    // Assertions
+    // =========================================================================
+
+    /**
+     * Assert the welcome flash is visible.
+     * shouldBe(visible) auto-waits and gives a clear failure message.
+     */
+    public SecureAreaPage assertWelcomeVisible() {
+        $(flashMessage).shouldBe(visible);
+        return this;
+    }
+
+    public SecureAreaPage assertFlashContains(String expected) {
+        $(flashMessage).shouldHave(text(expected));
+        return this;
+    }
+
+    public SecureAreaPage assertHeadingContains(String expected) {
+        $(heading).shouldHave(text(expected));
+        return this;
     }
 }

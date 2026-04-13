@@ -1,64 +1,51 @@
 package com.week06.pages;
 
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.Selenide;
 import com.week06.base.BasePage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
+import static com.codeborne.selenide.Selenide.open;
 
 /**
- * DropdownPage – Page Object for https://the-internet.herokuapp.com/dropdown
+ * DropdownPage – Selenide version (Week 8).
  *
- * Demonstrates:
- *  - Working with <select> elements via Selenium's Select class (wrapped in BasePage)
- *  - XPath: //option[not(@disabled)] – selecting non-disabled options
- *  - XPath: //option[@selected] – getting the currently selected option
- *  - preceding-sibling axis to find the label that precedes the dropdown
+ * MIGRATION from Week 6:
+ *
+ *   Week 6                                      Week 8
+ *   ─────────────────────────────────────────   ─────────────────────────────────────
+ *   new Select(waitForVisible(dropdown))       → $(dropdown).selectOption(text)
+ *     .selectByVisibleText(text)
+ *   new Select(waitForVisible(dropdown))       → $(dropdown).getSelectedOption().getText()
+ *     .getFirstSelectedOption().getText()
+ *   driver.findElements(enabledOptions).size() → $$(enabledOptions).size()
+ *   stream().map(getText).collect(...)         → $$(enabledOptions).texts()
+ *
+ * Selenide's selectOption() and getSelectedOption() replace the
+ * verbose java.util.Select wrapper entirely.
  */
 public class DropdownPage extends BasePage {
 
     // =========================================================================
-    // Locators
+    // Locators – identical XPath to Week 6
     // =========================================================================
 
-    // The <select> element
-    private final By dropdown = By.id("dropdown");
-
-    // Advanced XPath: all <option> elements that are NOT disabled
-    // Use case: the first option "Please select an option" has @disabled,
-    //           this selector gives only valid choices
+    private final By dropdown      = By.id("dropdown");
     private final By enabledOptions =
             By.xpath("//select[@id='dropdown']/option[not(@disabled)]");
-
-    // Advanced XPath: the currently selected option
-    private final By selectedOption =
-            By.xpath("//select[@id='dropdown']/option[@selected]");
-
-    // Advanced XPath: the <label> for the dropdown.
-    // preceding-sibling navigates left among siblings to find elements
-    // that share the same parent and come BEFORE the <select>
-    private final By dropdownLabel =
-            By.xpath("//select[@id='dropdown']/preceding-sibling::label");
-
-    // Page heading
-    private final By heading = By.xpath("//h3[contains(text(),'Dropdown')]");
-
-    // =========================================================================
-    // Constructor
-    // =========================================================================
-
-    public DropdownPage(WebDriver driver) {
-        super(driver);
-    }
+    private final By heading       = By.xpath("//h3[contains(text(),'Dropdown')]");
 
     // =========================================================================
     // Navigation
     // =========================================================================
 
-    public DropdownPage open(String baseUrl) {
-        driver.get(baseUrl + "/dropdown");
+    public DropdownPage open() {
+        Selenide.open("/dropdown");
         return this;
     }
 
@@ -67,10 +54,13 @@ public class DropdownPage extends BasePage {
     // =========================================================================
 
     /**
-     * Selects an option by its visible text (e.g. "Option 1", "Option 2").
+     * Select an option by visible text.
+     *
+     * Week 6: selectByVisibleText(dropdown, text) → new Select(...).selectByVisibleText(text)
+     * Week 8: $(dropdown).selectOption(text)  — built-in, no Select wrapper needed
      */
     public DropdownPage selectOption(String visibleText) {
-        selectByVisibleText(dropdown, visibleText);
+        $(dropdown).selectOption(visibleText);
         return this;
     }
 
@@ -79,42 +69,46 @@ public class DropdownPage extends BasePage {
     // =========================================================================
 
     /**
-     * Returns the currently selected option's text.
+     * Week 6: getSelectedOption(dropdown) → new Select(...).getFirstSelectedOption().getText()
+     * Week 8: $(dropdown).getSelectedOption().getText()
      */
     public String getSelectedOptionText() {
-        return getSelectedOption(dropdown);
+        return $(dropdown).getSelectedOption().getText().trim();
     }
 
     /**
-     * Returns a list of all selectable (non-disabled) option texts.
+     * Week 6: stream().map(WebElement::getText).collect(toList())
+     * Week 8: $$(enabledOptions).texts() — ElementsCollection built-in
      */
     public List<String> getAvailableOptions() {
-        return driver.findElements(enabledOptions)
-                .stream()
-                .map(WebElement::getText)
-                .collect(Collectors.toList());
+        return $$(enabledOptions).texts();
     }
 
-    /**
-     * Returns the number of selectable options (excludes the disabled placeholder).
-     */
     public int getEnabledOptionCount() {
-        return driver.findElements(enabledOptions).size();
-    }
-
-    /**
-     * Returns the label text displayed above the dropdown.
-     * Uses the preceding-sibling axis.
-     *
-     * Note: the-internet does not have a <label> here, so this demonstrates
-     * the concept; if absent the method returns an empty string gracefully.
-     */
-    public String getDropdownLabelText() {
-        List<WebElement> labels = driver.findElements(dropdownLabel);
-        return labels.isEmpty() ? "" : labels.get(0).getText().trim();
+        return $$(enabledOptions).size();
     }
 
     public String getHeading() {
         return getText(heading);
+    }
+
+    // =========================================================================
+    // Assertions
+    // =========================================================================
+
+    public DropdownPage assertSelectedOption(String expected) {
+        $(dropdown).getSelectedOption().shouldHave(exactText(expected));
+        return this;
+    }
+
+    public DropdownPage assertOptionCount(int expected) {
+        $$(enabledOptions).shouldHave(
+                com.codeborne.selenide.CollectionCondition.size(expected));
+        return this;
+    }
+
+    public DropdownPage assertHeadingVisible() {
+        $(heading).shouldBe(visible);
+        return this;
     }
 }

@@ -1,64 +1,64 @@
 package com.week06.pages;
 
-
+import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.SelenideElement;
 import com.week06.base.BasePage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
+
+import static com.codeborne.selenide.Condition.*;
+
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
+import static com.codeborne.selenide.Selenide.open;
 
 /**
- * LoginPage – Page Object for https://the-internet.herokuapp.com/login
+ * LoginPage – Selenide version (Week 8).
  *
- * Demonstrates:
- *  - Standard id/name-based locators
- *  - contains() for partial class match on the login button
- *  - ancestor axis to find the flash message container
- *  - Fluent API: methods return 'this' while on the same page,
- *    or return SecureAreaPage after a successful login
+ * MIGRATION from Week 6:
+ *
+ *   Week 6                           Week 8
+ *   ─────────────────────────────    ────────────────────────────────────
+ *   constructor(WebDriver driver)  → no-arg constructor (no driver field)
+ *   open(String baseUrl)           → open("/login")   (uses Configuration.baseUrl)
+ *   typeInto(By, text)             → $(By).val(text)  via BasePage helper
+ *   clickWhenReady(By)             → $(By).click()    via BasePage helper
+ *   getText(By)                    → $(By).getText()   via BasePage helper
+ *   isDisplayed(By)                → $(By).is(visible) via BasePage helper
+ *
+ * All XPath expressions are IDENTICAL to Week 6 — only the interaction
+ * layer underneath has changed.
  */
 public class LoginPage extends BasePage {
 
     // =========================================================================
-    // Locators
+    // Locators – identical to Week 6
     // =========================================================================
 
-    // Standard id-based selectors – fast, stable
-    private final By usernameInput = By.id("username");
-    private final By passwordInput = By.id("password");
-
-    // Advanced XPath: button whose class CONTAINS 'radius'
-    // Use case: the class string may be "radius" or "radius large" –
-    //            contains() handles both variants
-    private final By loginButton = By.xpath("//button[contains(@class,'radius')]");
-
-    // Advanced XPath: div whose id is 'flash' – the notification area
-    // starts-with used here because the id is exactly 'flash', but this
-    // pattern illustrates the function for ids like 'flash-error', 'flash-success'
-    private final By flashMessage = By.xpath("//div[starts-with(@id,'flash')]");
-
-    // Advanced XPath: find the 'h4' text inside the login form
-    // ancestor axis navigates UP: from the input to its containing <div>
+    private final By usernameInput  = By.id("username");
+    private final By passwordInput  = By.id("password");
+    private final By loginButton    = By.xpath("//button[contains(@class,'radius')]");
+    private final By flashMessage   = By.xpath("//div[starts-with(@id,'flash')]");
     private final By loginFormHeading =
             By.xpath("//input[@id='username']/ancestor::form/h4");
-
-    // =========================================================================
-    // Constructor
-    // =========================================================================
-
-    public LoginPage(WebDriver driver) {
-        super(driver);
-    }
 
     // =========================================================================
     // Navigation
     // =========================================================================
 
-    public LoginPage open(String baseUrl) {
-        driver.get(baseUrl + "/login");
+    /**
+     * Navigate to the login page.
+     * Uses Configuration.baseUrl so no hardcoded URL here.
+     *
+     * Week 6: open(String baseUrl) → driver.get(baseUrl + "/login")
+     * Week 8: open("/login")       → Selenide prepends Configuration.baseUrl
+     */
+    public LoginPage open() {
+        Selenide.open("/login");
         return this;
     }
 
     // =========================================================================
-    // Actions – return 'this' for fluent chaining on the same page
+    // Actions
     // =========================================================================
 
     public LoginPage enterUsername(String username) {
@@ -72,19 +72,26 @@ public class LoginPage extends BasePage {
     }
 
     /**
-     * Clicks the login button.
-     * Returns SecureAreaPage because a successful login navigates there.
-     * If you need to test a failed login, add a method that returns LoginPage.
+     * Click the login button and return the SecureAreaPage.
+     *
+     * Week 6: returned new SecureAreaPage(driver)
+     * Week 8: returned new SecureAreaPage() — no driver to pass
      */
     public SecureAreaPage clickLogin() {
         clickWhenReady(loginButton);
-        return new SecureAreaPage(driver);
+        return new SecureAreaPage();
     }
 
     // =========================================================================
-    // Queries / getters – return data, not page objects
+    // Queries / assertions
     // =========================================================================
 
+    /**
+     * Wait for the flash message to appear and return its text.
+     *
+     * Week 6: used waitForVisible(flashMessage).getText()
+     * Week 8: shouldBe(visible) triggers auto-wait, then getText()
+     */
     public String getFlashMessageText() {
         return getText(flashMessage);
     }
@@ -95,5 +102,17 @@ public class LoginPage extends BasePage {
 
     public String getLoginFormHeading() {
         return getText(loginFormHeading);
+    }
+
+    /**
+     * Assert the flash message contains the given text.
+     * Returns this for optional chaining.
+     *
+     * NEW in Week 8: Selenide shouldHave(text(...)) gives a much cleaner
+     * assertion failure message than TestNG assertEquals.
+     */
+    public LoginPage assertFlashContains(String expected) {
+        $(flashMessage).shouldHave(text(expected));
+        return this;
     }
 }

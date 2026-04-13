@@ -8,105 +8,94 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 /**
- * LoginPageTest – tests for https://the-internet.herokuapp.com/login
+ * LoginPageTest – Selenide version (Week 8).
  *
- * Demonstrates the POM pattern:
- *  - No driver.findElement() calls – all interaction via LoginPage / SecureAreaPage
- *  - Allure annotations for readable report structure
- *  - Page chaining: LoginPage → SecureAreaPage → LoginPage (logout)
+ * MIGRATION from Week 6:
+ *
+ *   Week 6                                   Week 8
+ *   ──────────────────────────────────────   ──────────────────────────────────────
+ *   new LoginPage(driver).open(BASE_URL)    → new LoginPage().open()
+ *   assertTrue(secure.isFlashDisplayed())   → secure.assertWelcomeVisible()  (Selenide)
+ *   assertTrue(flash.contains("..."))       → page.assertFlashContains("...")
+ *   assertEquals(heading, "Login Page")     → kept as TestNG assertEquals
+ *                                             (or could use .shouldHave(exactText))
+ *
+ * The test methods are IDENTICAL in structure to Week 6.
+ * The only visible change: no 'driver' anywhere in this file.
  */
-@Epic("Week 6 – Page Object Model")
+@Epic("Week 8 – Selenide")
 @Feature("Login Page")
 public class LoginPageTest extends BaseTest {
 
-    // Valid credentials for the-internet
     private static final String VALID_USER = "tomsmith";
     private static final String VALID_PASS = "SuperSecretPassword!";
-
-    // =========================================================================
-    // Tests
-    // =========================================================================
 
     @Test(description = "Valid login should display secure area with welcome message",
           groups = {"smoke", "login"})
     @Story("Successful authentication")
     @Severity(SeverityLevel.BLOCKER)
-    @Description("Enter valid credentials and verify the user lands on the secure area page.")
+    @Description(
+        "Week 6→8 migration: same test, no WebDriver reference. " +
+        "isFlashDisplayed() replaced with Selenide shouldBe(visible) via assertWelcomeVisible()."
+    )
     public void validLoginShowsSecureArea() {
-        LoginPage loginPage = new LoginPage(driver).open(BASE_URL);
-
-        SecureAreaPage securePage = loginPage
+        // Week 6: new LoginPage(driver).open(BASE_URL)
+        // Week 8: no driver, no BASE_URL — SelenideConfig.baseUrl handles it
+        SecureAreaPage securePage = new LoginPage()
+                .open()
                 .enterUsername(VALID_USER)
                 .enterPassword(VALID_PASS)
                 .clickLogin();
 
-        // The flash message should contain the success text
-        String flash = securePage.getFlashMessageText();
-        assertTrue(securePage.isFlashDisplayed(), "Flash message should be visible");
-        assertTrue(flash.contains("You logged into a secure area"),
-                "Flash should contain success text, was: " + flash);
-
-        // Heading should confirm we are on the secure page
-        assertTrue(securePage.getHeadingText().contains("Secure Area"),
-                "Heading should contain 'Secure Area'");
+        // Selenide assertion — auto-waits for flash to appear
+        securePage.assertWelcomeVisible();
+        securePage.assertFlashContains("You logged into a secure area");
+        securePage.assertHeadingContains("Secure Area");
     }
 
     @Test(description = "Invalid password should show error flash message",
           groups = {"regression", "login"})
     @Story("Failed authentication")
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Enter a wrong password and verify the login page shows an error banner.")
+    @Description("Wrong password → flash should contain 'Your password is invalid'.")
     public void invalidPasswordShowsError() {
-        LoginPage loginPage = new LoginPage(driver).open(BASE_URL);
-
-        // Deliberately use wrong password – stay on LoginPage, do NOT navigate to SecureArea
-        // We do NOT call clickLogin() which returns SecureAreaPage; instead we use the raw action
-        loginPage.enterUsername(VALID_USER)
-                 .enterPassword("wrongPassword");
-
-        // Click the button manually through the page object without type inference
-        // This requires an additional method in LoginPage – see loginAndExpectFailure()
-        // For now we call the standard clickLogin() and come back to verify flash
-        // (The site redirects to /login on failure, so SecureAreaPage.driver is on /login)
-        SecureAreaPage result = loginPage.clickLogin(); // driver stays on /login because login failed
-
-        // The site still shows LoginPage HTML; we read the flash from the same driver
-        String flash = result.getFlashMessageText();
-        assertTrue(flash.contains("Your password is invalid"),
-                "Expected invalid password message, got: " + flash);
+        // clickLogin() returns SecureAreaPage structurally, but because login fails,
+        // the driver stays on /login. We then use assertFlashContains on the
+        // LoginPage directly — note: in real projects add clickLoginExpectingFailure().
+        new LoginPage()
+                .open()
+                .enterUsername(VALID_USER)
+                .enterPassword("wrongPassword")
+                .clickLogin()
+                .assertFlashContains("Your password is invalid");
     }
 
     @Test(description = "Login form heading should be 'Login Page'",
           groups = {"regression", "login"})
     @Story("Page content")
     @Severity(SeverityLevel.MINOR)
-    @Description("Verify the login form heading text using ancestor XPath axis.")
+    @Description("Verify the ancestor-XPath heading text.")
     public void loginFormHeadingIsCorrect() {
-        LoginPage loginPage = new LoginPage(driver).open(BASE_URL);
+        String heading = new LoginPage()
+                .open()
+                .getLoginFormHeading();
 
-        String heading = loginPage.getLoginFormHeading();
-        assertEquals(heading, "Login Page",
-                "Login form heading mismatch");
+        assertEquals(heading, "Login Page", "Login form heading mismatch");
     }
 
     @Test(description = "User can log out after logging in",
           groups = {"smoke", "login"})
     @Story("Logout flow")
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Perform login then logout and verify the user returns to login page.")
+    @Description("Login → logout → assert 'You logged out' flash.")
     public void logoutReturnToLoginPage() {
-        LoginPage loginPage = new LoginPage(driver).open(BASE_URL);
-
-        SecureAreaPage securePage = loginPage
+        LoginPage afterLogout = new LoginPage()
+                .open()
                 .enterUsername(VALID_USER)
                 .enterPassword(VALID_PASS)
-                .clickLogin();
+                .clickLogin()
+                .clickLogout();
 
-        LoginPage afterLogout = securePage.clickLogout();
-
-        // After logout the flash message should mention logging out
-        String flash = afterLogout.getFlashMessageText();
-        assertTrue(flash.contains("You logged out"),
-                "Expected logout flash, was: " + flash);
+        afterLogout.assertFlashContains("You logged out");
     }
 }

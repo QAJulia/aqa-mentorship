@@ -1,80 +1,70 @@
 package com.week06.pages;
 
+import com.codeborne.selenide.CollectionCondition;
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.SelenideElement;
 import com.week06.base.BasePage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
+import static com.codeborne.selenide.Selenide.open;
 
 /**
- * TablesPage – Page Object for https://the-internet.herokuapp.com/tables
+ * TablesPage – Selenide version (Week 8).
  *
- * Demonstrates the most advanced XPath patterns of Week 6:
- *  - Selecting a row by a specific cell value
- *  - following-sibling axis: get adjacent column values
- *  - ancestor axis: navigate from cell up to row, then down again
- *  - normalize-space() for whitespace-safe matching
- *  - Dynamic XPath construction (parameterised locators)
+ * MIGRATION from Week 6:
+ *
+ *   Week 6                                  Week 8
+ *   ─────────────────────────────────────   ───────────────────────────────────────
+ *   driver.findElements(By) → List<WebEl>  → $$(By) → ElementsCollection
+ *   .stream().map(getText)                 → .texts()   (built-in on ElementsCollection)
+ *   driver.findElements(By).size()         → $$(By).size()
+ *   !driver.findElements(By).isEmpty()     → $$(By).size() > 0
+ *   driver.findElement(By).getText()       → $(By).getText()
+ *   row.findElements(By.tagName("td"))     → row.$$(By.tagName("td"))
+ *   clickWhenReady(By)                     → $(By).click()
+ *
+ * All XPath expressions are identical to Week 6 — navigation axes, normalize-space,
+ * following-sibling, ancestor — none of those change when switching to Selenide.
  */
 public class TablesPage extends BasePage {
 
-    // Table 1 id
     private static final String TABLE1 = "table1";
-    private static final String TABLE2 = "table2";
 
     // =========================================================================
-    // Static locators
+    // Static locators – identical XPath to Week 6
     // =========================================================================
 
-    // All header cells in Table 1
     private final By table1Headers =
             By.xpath("//table[@id='" + TABLE1 + "']//thead/tr/th");
 
-    // All body rows in Table 1
     private final By table1Rows =
             By.xpath("//table[@id='" + TABLE1 + "']//tbody/tr");
 
-    // Advanced XPath: the <a> delete link inside any row
-    // following-sibling goes right from a <td> that holds the name
     private final By allDeleteLinks =
             By.xpath("//table[@id='" + TABLE1 + "']//td/a[text()='delete']");
 
-    // Advanced XPath: all edit links
     private final By allEditLinks =
             By.xpath("//table[@id='" + TABLE1 + "']//td/a[text()='edit']");
-
-    // =========================================================================
-    // Constructor
-    // =========================================================================
-
-    public TablesPage(WebDriver driver) {
-        super(driver);
-    }
 
     // =========================================================================
     // Navigation
     // =========================================================================
 
-    public TablesPage open(String baseUrl) {
-        driver.get(baseUrl + "/tables");
+    public TablesPage open() {
+        Selenide.open("/tables");
         return this;
     }
 
     // =========================================================================
-    // Dynamic (parameterised) locators
+    // Dynamic (parameterised) locators – identical XPath to Week 6
     // =========================================================================
 
-    /**
-     * Returns the XPath locator for the row in table1 where the Last Name column
-     * exactly matches the provided value.
-     *
-     * XPath breakdown:
-     *   //table[@id='table1']  → table with id table1
-     *   //tbody/tr             → any body row
-     *   [td[1][normalize-space()='Smith']]  → where first <td> equals 'Smith'
-     */
     private By rowByLastName(String lastName) {
         return By.xpath(
                 "//table[@id='" + TABLE1 + "']//tbody/tr" +
@@ -82,14 +72,6 @@ public class TablesPage extends BasePage {
         );
     }
 
-    /**
-     * Returns the locator for the email cell of a row identified by last name.
-     *
-     * Uses following-sibling to jump from the last-name cell to the email cell
-     * (which is 3 positions to the right: [1]=first name, [2]=email, [3]=due, [4]=web, [5]=action)
-     *
-     * Axis: td[normalize-space()='lastName'] / following-sibling::td[2]
-     */
     private By emailCellByLastName(String lastName) {
         return By.xpath(
                 "//table[@id='" + TABLE1 + "']//tbody/tr/" +
@@ -97,12 +79,6 @@ public class TablesPage extends BasePage {
         );
     }
 
-    /**
-     * Returns the locator for the action link (edit/delete) for a given last name.
-     *
-     * Uses ancestor axis: start at the matching <td>, go UP to the <tr>,
-     * then DOWN to the last <td>'s link.
-     */
     private By actionLinkByLastName(String lastName, String action) {
         return By.xpath(
                 "//table[@id='" + TABLE1 + "']//td[normalize-space()='" + lastName + "']" +
@@ -115,12 +91,12 @@ public class TablesPage extends BasePage {
     // =========================================================================
 
     public TablesPage clickEditFor(String lastName) {
-        clickWhenReady(actionLinkByLastName(lastName, "edit"));
+        $(actionLinkByLastName(lastName, "edit")).click();
         return this;
     }
 
     public TablesPage clickDeleteFor(String lastName) {
-        clickWhenReady(actionLinkByLastName(lastName, "delete"));
+        $(actionLinkByLastName(lastName, "delete")).click();
         return this;
     }
 
@@ -129,61 +105,63 @@ public class TablesPage extends BasePage {
     // =========================================================================
 
     /**
-     * Returns the text of all header cells in Table 1.
+     * Returns header text list.
+     *
+     * Week 6: stream().map(WebElement::getText).collect(...)
+     * Week 8: ElementsCollection.texts() — built-in convenience method
      */
     public List<String> getTable1Headers() {
-        return driver.findElements(table1Headers)
-                .stream()
-                .map(WebElement::getText)
-                .collect(Collectors.toList());
+        return $$(table1Headers).texts();
     }
 
-    /**
-     * Returns the number of body rows in Table 1.
-     */
     public int getTable1RowCount() {
-        return driver.findElements(table1Rows).size();
+        return $$(table1Rows).size();
     }
 
-    /**
-     * Returns whether a row with the given last name exists in Table 1.
-     */
     public boolean hasRowWithLastName(String lastName) {
-        return !driver.findElements(rowByLastName(lastName)).isEmpty();
+        return $$(rowByLastName(lastName)).size() > 0;
     }
 
-    /**
-     * Returns the email cell value for a row identified by last name.
-     *
-     * Uses the following-sibling XPath pattern.
-     */
     public String getEmailByLastName(String lastName) {
         return getText(emailCellByLastName(lastName));
     }
 
     /**
-     * Returns the full text of a row as a list of cell strings.
-     * Useful for asserting all columns at once.
+     * Returns all cell texts for a row identified by last name.
+     *
+     * Week 6: row.findElements(By.tagName("td")).stream()...
+     * Week 8: row.$$(By.tagName("td")).texts()
+     *         $() on a SelenideElement searches WITHIN that element (scoped find)
      */
     public List<String> getRowCellsByLastName(String lastName) {
-        WebElement row = driver.findElement(rowByLastName(lastName));
-        return row.findElements(By.tagName("td"))
-                .stream()
-                .map(WebElement::getText)
-                .collect(Collectors.toList());
+        SelenideElement row = $(rowByLastName(lastName)).shouldBe(visible);
+        return row.$$(By.tagName("td")).texts();
     }
 
-    /**
-     * Returns the number of "delete" action links visible in Table 1.
-     */
     public int getDeleteLinkCount() {
-        return driver.findElements(allDeleteLinks).size();
+        return $$(allDeleteLinks).size();
     }
 
-    /**
-     * Returns the number of "edit" action links visible in Table 1.
-     */
     public int getEditLinkCount() {
-        return driver.findElements(allEditLinks).size();
+        return $$(allEditLinks).size();
+    }
+
+    // =========================================================================
+    // Assertions
+    // =========================================================================
+
+    public TablesPage assertRowCount(int expected) {
+        $$(table1Rows).shouldHave(CollectionCondition.size(expected));
+        return this;
+    }
+
+    public TablesPage assertRowExists(String lastName) {
+        $(rowByLastName(lastName)).shouldBe(visible);
+        return this;
+    }
+
+    public TablesPage assertEmailForRow(String lastName, String expectedEmail) {
+        $(emailCellByLastName(lastName)).shouldHave(exactText(expectedEmail));
+        return this;
     }
 }

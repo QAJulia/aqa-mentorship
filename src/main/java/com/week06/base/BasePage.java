@@ -1,128 +1,156 @@
 package com.week06.base;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import com.codeborne.selenide.CollectionCondition;
+import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
+import org.openqa.selenium.By;
 
 import java.time.Duration;
 import java.util.List;
 
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
+
 /**
- * BasePage – superclass for all Page Object classes.
+ * BasePage – Selenide version (Week 8).
  *
- * Contains:
- *  - A reference to the shared WebDriver instance
- *  - A pre-configured WebDriverWait (explicit wait)
- *  - Common helper methods used across multiple pages
+ * MIGRATION from Week 6 BasePage:
  *
- * Every concrete page class extends BasePage and calls super(driver).
+ *   Week 6 had:
+ *     - protected WebDriver driver
+ *     - protected WebDriverWait wait
+ *     - Constructor accepting WebDriver
+ *
+ *   Week 8 has:
+ *     - NO driver field  — Selenide manages the driver globally
+ *     - NO wait field    — every $() call has an auto-wait built in
+ *     - NO constructor parameter — page objects are instantiated with new XxxPage()
+ *
+ * METHOD MAPPING (Week 6 → Week 8):
+ *
+ *   waitForVisible(By)          →  $(By).shouldBe(visible)
+ *   clickWhenReady(By)          →  $(By).click()
+ *   typeInto(By, text)          →  $(By).val(text)
+ *   getText(By)                 →  $(By).getText()
+ *   findAll(By)                 →  $$(By)
+ *   isDisplayed(By)             →  $(By).is(visible)
+ *   isSelected(By)              →  $(By).is(checked)
+ *   selectByVisibleText(By, t)  →  $(By).selectOption(t)
+ *   getSelectedOption(By)       →  $(By).getSelectedOption().getText()
  */
 public abstract class BasePage {
 
-    protected final WebDriver driver;
-    protected final WebDriverWait wait;
-
-    private static final int DEFAULT_TIMEOUT_SECONDS = 10;
-
-    /**
-     * Constructor – all page objects receive the driver from the test.
-     *
-     * @param driver the active WebDriver session
-     */
-    protected BasePage(WebDriver driver) {
-        this.driver = driver;
-        this.wait   = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS));
-    }
-
     // =========================================================================
     // Core interaction helpers
+    // – Each method wraps a single Selenide call with a named intent.
+    // – The explicit By parameter keeps the same signature as Week 6
+    //   so page classes look identical from the outside.
     // =========================================================================
 
     /**
      * Wait until the element is visible, then return it.
+     * Selenide's auto-wait fires before shouldBe() is evaluated.
      */
-    protected WebElement waitForVisible(By locator) {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+    protected SelenideElement waitForVisible(By locator) {
+        return $(locator).shouldBe(visible);
     }
 
     /**
-     * Wait until the element is clickable, then click it.
+     * Click the element when it is clickable.
+     * Selenide waits for the element to be visible+enabled before clicking.
      */
     protected void clickWhenReady(By locator) {
-        wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
+        $(locator).click();
     }
 
     /**
-     * Wait until the element is visible, clear it, then type.
+     * Clear the field and type the given text.
+     * val() is Selenide's equivalent of clear() + sendKeys().
      */
     protected void typeInto(By locator, String text) {
-        WebElement element = waitForVisible(locator);
-        element.clear();
-        element.sendKeys(text);
+        $(locator).val(text);
     }
 
     /**
-     * Return the trimmed text of the first matching element.
+     * Return the trimmed visible text of the element.
+     * Selenide waits for the element to exist in DOM before getText().
      */
     protected String getText(By locator) {
-        return waitForVisible(locator).getText().trim();
+        return $(locator).getText().trim();
     }
 
     /**
-     * Return all matching elements (no wait – use when list may be empty).
+     * Return all matching elements as an ElementsCollection (Selenide list).
      */
-    protected List<WebElement> findAll(By locator) {
-        return driver.findElements(locator);
+    protected ElementsCollection findAll(By locator) {
+        return $$(locator);
     }
 
     /**
-     * Check whether an element is currently displayed (non-throwing).
+     * Non-throwing visibility check.
+     * Selenide's is() checks the current state without throwing.
      */
     protected boolean isDisplayed(By locator) {
-        try {
-            return driver.findElement(locator).isDisplayed();
-        } catch (NoSuchElementException e) {
-            return false;
-        }
+        return $(locator).is(visible);
     }
 
     /**
-     * Check whether a checkbox/radio is selected.
+     * Non-throwing selected/checked check.
      */
     protected boolean isSelected(By locator) {
-        return driver.findElement(locator).isSelected();
+        return $(locator).is(checked);
     }
 
     /**
-     * Select an <option> by visible text inside a <select> element.
+     * Select a <select> option by its visible text.
      */
     protected void selectByVisibleText(By locator, String text) {
-        new Select(waitForVisible(locator)).selectByVisibleText(text);
+        $(locator).selectOption(text);
     }
 
     /**
      * Return the currently selected option text from a <select> element.
      */
     protected String getSelectedOption(By locator) {
-        return new Select(waitForVisible(locator)).getFirstSelectedOption().getText();
+        return $(locator).getSelectedOption().getText().trim();
+    }
+
+    // =========================================================================
+    // Assertion helpers — return the element for optional chaining
+    // =========================================================================
+
+    /**
+     * Assert the element is visible with the default timeout.
+     */
+    protected SelenideElement assertVisible(By locator) {
+        return $(locator).shouldBe(visible);
+    }
+
+    /**
+     * Assert the element's text contains the expected substring.
+     */
+    protected SelenideElement assertTextContains(By locator, String expected) {
+        return $(locator).shouldHave(text(expected));
+    }
+
+    /**
+     * Assert the collection has exactly the expected size.
+     */
+    protected ElementsCollection assertCollectionSize(By locator, int expectedSize) {
+        return $$(locator).shouldHave(CollectionCondition.size(expectedSize));
     }
 
     // =========================================================================
     // Page-level utilities
     // =========================================================================
 
-    /**
-     * Return the current page title.
-     */
     public String getTitle() {
-        return driver.getTitle();
+        return com.codeborne.selenide.WebDriverRunner.getWebDriver().getTitle();
     }
 
-    /**
-     * Return the current URL.
-     */
     public String getCurrentUrl() {
-        return driver.getCurrentUrl();
+        return com.codeborne.selenide.WebDriverRunner.getWebDriver().getCurrentUrl();
     }
 }

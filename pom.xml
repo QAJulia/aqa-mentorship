@@ -34,26 +34,18 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- ===== SELENIUM ===== -->
-        <!--
-            selenium-java is the main Selenium dependency.
-            It includes bindings for Chrome, Firefox, Edge and all WebDriver interfaces.
-        -->
+        <!-- Selenide – includes Selenium 4 and WebDriverManager internally -->
         <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>${selenium.version}</version>
+            <groupId>com.codeborne</groupId>
+            <artifactId>selenide</artifactId>
+            <version>7.3.2</version>
         </dependency>
 
-        <!--
-            WebDriverManager automatically downloads the correct ChromeDriver / GeckoDriver.
-            No need to manually manage driver executables.
-            Docs: https://github.com/bonigarcia/webdrivermanager
-        -->
+        <!-- Allure Selenide integration (replaces allure-testng screenshot listener) -->
         <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-            <version>${webdrivermanager.version}</version>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-selenide</artifactId>
+            <version>2.25.0</version>
         </dependency>
 
         <!-- ===== ALLURE ===== -->
@@ -101,7 +93,7 @@
                         mvn test -DsuiteXmlFile=testng-ui.xml
                     -->
                     <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/testng-week6.xml</suiteXmlFile>
+                        <suiteXmlFile>src/test/resources/testng-week8.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <!-- Required for Allure to capture results -->
                     <argLine>
