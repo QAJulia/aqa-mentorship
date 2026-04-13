@@ -21,15 +21,7 @@
         <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
     </listeners>
 
-    <!-- ===================================================================
-         Smoke suite – fast, critical path tests only
-         =================================================================== -->
     <test name="Smoke Tests">
-        <groups>
-            <run>
-                <include name="smoke"/>
-            </run>
-        </groups>
         <classes>
             <class name="ui.LoginPageTest"/>
             <class name="ui.CheckboxesPageTest"/>
@@ -38,15 +30,7 @@
         </classes>
     </test>
 
-    <!-- ===================================================================
-         Regression suite – all tests
-         =================================================================== -->
     <test name="Regression Tests">
-        <groups>
-            <run>
-                <include name="regression"/>
-            </run>
-        </groups>
         <classes>
             <class name="ui.LoginPageTest"/>
             <class name="ui.CheckboxesPageTest"/>
