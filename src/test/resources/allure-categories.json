@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Product Defects",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*AssertionError.*|.*expected:.*but was:.*|.*Expected status code.*|.*Expected content type.*|.*JSON path.*"
+  },
+  {
+    "name": "Test Defects",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*NullPointerException.*|.*IllegalStateException.*|.*IllegalArgumentException.*|.*ClassCastException.*|.*IndexOutOfBoundsException.*"
+  },
+  {
+    "name": "Infrastructure Problems",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*Connection refused.*|.*SocketTimeoutException.*|.*ConnectException.*|.*UnknownHostException.*|.*SSLException.*|.*java.net.SocketException.*"
+  },
+  {
+    "name": "Schema Violations",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*schema.*|.*Schema.*|.*does not match.*|.*is not valid.*"
+  },
+  {
+    "name": "Performance Failures",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*response time.*|.*milliseconds.*|.*timeout.*|.*timed out.*"
+  }
+]

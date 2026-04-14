@@ -1,4 +1,4 @@
-package com.week09.api.model;
+package com.week10.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

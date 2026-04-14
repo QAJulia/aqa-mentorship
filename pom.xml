@@ -15,26 +15,8 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!-- ── Framework versions ───────────────────────────────────────── -->
-
-        <!--
-            Selenide 7.x bundles selenium-java 4.x + webdrivermanager 5.x.
-            No need to declare selenium-java or webdrivermanager separately.
-        -->
-        <selenide.version>7.3.2</selenide.version>
-
-        <!--
-            REST Assured – fluent API for HTTP testing.
-            Replaces raw HttpClient calls with given/when/then DSL.
-        -->
         <rest-assured.version>5.4.0</rest-assured.version>
-
-        <!--
-            Jackson – JSON serialisation / deserialisation.
-            Used by REST Assured to map responses to Java POJOs.
-        -->
         <jackson.version>2.15.2</jackson.version>
-
         <testng.version>7.8.0</testng.version>
         <allure.version>2.25.0</allure.version>
         <aspectj.version>1.9.20.1</aspectj.version>
@@ -46,16 +28,7 @@
     <dependencies>
 
         <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!-- UI – Selenide                                                   -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <dependency>
-            <groupId>com.codeborne</groupId>
-            <artifactId>selenide</artifactId>
-            <version>${selenide.version}</version>
-        </dependency>
-
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!-- API – REST Assured                                              -->
+        <!-- REST Assured core                                               -->
         <!-- ═══════════════════════════════════════════════════════════════ -->
         <dependency>
             <groupId>io.rest-assured</groupId>
@@ -63,7 +36,20 @@
             <version>${rest-assured.version}</version>
         </dependency>
 
-        <!-- Jackson core + databind + annotations -->
+        <!--
+            JSON Schema Validator – NEW in Week 10.
+            Provides RestAssured.given()...body(matchesJsonSchemaInClasspath("schema.json"))
+            Uses json-schema-validator under the hood (Everit library).
+        -->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>${rest-assured.version}</version>
+        </dependency>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- Jackson                                                         -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -71,7 +57,7 @@
         </dependency>
 
         <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!-- Testing – TestNG                                                -->
+        <!-- TestNG                                                          -->
         <!-- ═══════════════════════════════════════════════════════════════ -->
         <dependency>
             <groupId>org.testng</groupId>
@@ -81,21 +67,22 @@
         </dependency>
 
         <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!-- Reporting – Allure                                              -->
+        <!-- Allure                                                          -->
         <!-- ═══════════════════════════════════════════════════════════════ -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-testng</artifactId>
             <version>${allure.version}</version>
         </dependency>
+
+        <!--
+            allure-rest-assured – NEW explicit usage in Week 10.
+            Provides AllureRestAssured filter that attaches every request
+            and response body to the Allure report as a step attachment.
+        -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-rest-assured</artifactId>
-            <version>${allure.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-selenide</artifactId>
             <version>${allure.version}</version>
         </dependency>
 
@@ -109,14 +96,12 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- SLF4J API -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
 
-        <!-- Logback as SLF4J implementation (replaces slf4j-simple) -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -134,7 +119,7 @@
                 <version>3.1.2</version>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/testng-week9.xml</suiteXmlFile>
+                        <suiteXmlFile>src/test/resources/testng-week10.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"

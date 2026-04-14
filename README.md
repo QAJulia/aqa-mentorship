@@ -212,7 +212,7 @@ Calls are scheduled **once per week**. Each week consists of:
 **Topics**
 - Final project layout for API + UI modules/packages
 - Base classes:
-    - `base.BaseTest`, `base.BaseApiTest`, `base.BaseUiTest`
+    - `base.BaseTest`, `base.base.BaseApiTest`, `base.BaseUiTest`
 - Shared utilities:
     - Configuration management (properties/typed config)
     - Logging setup

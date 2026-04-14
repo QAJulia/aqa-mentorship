@@ -54,7 +54,7 @@ src/
 │
 └── test/java/
     ├── base.BaseTest.java                   ← root: logs environment
-    ├── base.BaseApiTest.java                ← API base: REST Assured init + BooksClient
+    ├── base.base.BaseApiTest.java                ← API base: REST Assured init + BooksClient
     ├── base.BaseUiTest.java                 ← UI base:  Selenide init + browser teardown
     ├── api/
     │   └── BooksApiTest.java           ← pure API tests
@@ -72,7 +72,7 @@ src/
 base.BaseTest
   │  @BeforeSuite: log environment (URL, browser, headless)
   │
-  ├── base.BaseApiTest
+  ├── base.base.BaseApiTest
   │     @BeforeSuite: RestAssuredConfig.init()
   │     @BeforeMethod: new BooksClient()
   │     field: BooksClient booksClient
@@ -87,11 +87,11 @@ base.BaseTest
 | Class | Knows about | Does NOT know about |
 |---|---|---|
 | `base.BaseTest` | Logging, AppConfig | Driver, HTTP client |
-| `base.BaseApiTest` | REST Assured, BooksClient | Browser, Selenide |
+| `base.base.BaseApiTest` | REST Assured, BooksClient | Browser, Selenide |
 | `base.BaseUiTest` | Selenide, browser lifecycle | HTTP, BooksClient |
 
 A **unified test** (like `BookStoreSyncTest`) extends `base.BaseUiTest` and adds a
-`BooksClient` field directly. It does NOT extend `base.BaseApiTest` — that would
+`BooksClient` field directly. It does NOT extend `base.base.BaseApiTest` — that would
 inherit the REST Assured `@BeforeSuite` + `@BeforeMethod`, which is unnecessary
 for a class that only needs the client object.
 

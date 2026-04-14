@@ -1,7 +1,7 @@
 package api;
 
 import base.BaseApiTest;
-import com.week09.api.model.Book;
+import com.week10.api.model.Book;
 import io.qameta.allure.*;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
@@ -11,108 +11,140 @@ import java.util.List;
 import static org.testng.Assert.*;
 
 /**
- * BooksApiTest – REST API tests for the DemoQA BookStore endpoint.
+ * BooksApiTest – comprehensive API tests for GET /BookStore/v1/Books.
  *
- * Base: base.BaseApiTest (provides booksClient, RestAssured initialisation)
+ * ALLURE TAGS STRATEGY (Week 10 deliverable):
  *
- * Endpoint under test: GET https://demoqa.com/BookStore/v1/Books
+ *   @Epic    → top-level business domain ("Week 10 – Advanced REST Assured")
+ *   @Feature → the specific API feature ("Books Catalogue API")
+ *   @Story   → individual user story / behaviour being verified
+ *   @Severity → BLOCKER > CRITICAL > NORMAL > MINOR > TRIVIAL
+ *   @TmsLink  → link to a test management system ticket (e.g. Jira)
+ *   @Issue    → link to a bug tracker issue
+ *   @Link     → any external resource (API docs, Swagger, etc.)
+ *   @Owner    → name of the test owner
  *
- * Tests cover:
- *   1. HTTP response status and Content-Type
- *   2. Response body shape (books list is non-empty)
- *   3. Book model fields are not null/empty
- *   4. A specific book can be found by ISBN
+ * WHY CATEGORISE?
+ *   In Allure you can group tests by Epic, Feature, Story in the "Behaviours" tab.
+ *   This makes the report readable for non-technical stakeholders:
+ *     "Books Catalogue API > Successful GET > Returns HTTP 200" — clear without code.
  *
- * All requests/responses are automatically attached to the Allure report
- * via the AllureRestAssured filter registered in BooksClient.
+ *   The "Categories" tab additionally groups failures by type
+ *   (product defect, test defect, infrastructure problem).
  */
-@Epic("Week 9 – Unified Framework")
-@Feature("BookStore API")
+@Epic("Week 10 – Advanced REST Assured")
+@Feature("Books Catalogue API")
+@Owner("QA Mentorship")
+@Link(name = "API Docs", url = "https://demoqa.com/swagger/")
 public class BooksApiTest extends BaseApiTest {
 
-    // The ISBN of "You Don't Know JS" – a well-known book in the DemoQA catalogue
     private static final String KNOWN_ISBN = "9781449325862";
 
-    @Test(description = "GET /Books returns HTTP 200",
-          groups = {"smoke", "api"})
-    @Story("Books endpoint – HTTP contract")
+    // =========================================================================
+    // Smoke – HTTP contract
+    // =========================================================================
+
+    @Test(description = "GET /Books returns HTTP 200 with JSON",
+          groups = {"smoke", "api", "contract"})
+    @Story("Successful GET – HTTP contract")
     @Severity(SeverityLevel.BLOCKER)
-    @Description("Verify the books endpoint responds with 200 OK and JSON content type.")
-    public void getBooksReturnsHttp200() {
-        Response response = booksClient.getBooksResponse();
+    @Description("Verifies the endpoint responds with 200 OK and application/json content type.")
+    public void getBooksReturns200Json() {
+        Response response = booksClient.getBooksRawResponse();
 
         assertEquals(response.statusCode(), 200,
-                "Expected 200 OK from /BookStore/v1/Books");
+                "Expected HTTP 200 from /BookStore/v1/Books");
         assertTrue(response.contentType().contains("application/json"),
                 "Expected JSON content type, got: " + response.contentType());
     }
 
-    @Test(description = "GET /Books returns a non-empty list",
-          groups = {"smoke", "api"})
-    @Story("Books list")
+    @Test(description = "GET /Books responds within 3 seconds",
+          groups = {"smoke", "api", "performance"})
+    @Story("Response time")
     @Severity(SeverityLevel.CRITICAL)
-    @Description("The books list must contain at least 1 book.")
-    public void getBooksReturnsNonEmptyList() {
-        List<Book> books = booksClient.getAllBooks();
+    @Description("Response time check: expects the endpoint to respond under 3000 ms.")
+    public void getBooksRespondsWithin3Seconds() {
+        Response response = booksClient.getBooksRawResponse();
 
-        assertFalse(books.isEmpty(), "Book list should not be empty");
-        log.info("Books returned by API: {}", books.size());
+        long time = response.time();
+        assertTrue(time < 3000,
+                "Expected response in < 3000 ms, got: " + time + " ms");
+        log.info("Response time: {} ms", time);
     }
 
-    @Test(description = "Each book has required non-null fields",
-          groups = {"regression", "api"})
-    @Story("Book model validation")
+    // =========================================================================
+    // Regression – business rules
+    // =========================================================================
+
+    @Test(description = "Books list is non-empty (minimum 8 books)",
+          groups = {"regression", "api", "books-list"})
+    @Story("Books list – size")
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Validates isbn, title, author, and publisher are not null or blank for every book.")
+    @Description("The DemoQA catalogue always has at least 8 books.")
+    public void booksListIsNonEmpty() {
+        List<Book> books = booksClient.getAllBooks();
+
+        assertFalse(books.isEmpty(), "Book list must not be empty");
+        assertTrue(books.size() >= 8,
+                "Expected at least 8 books, got: " + books.size());
+        log.info("Catalogue size: {}", books.size());
+    }
+
+    @Test(description = "Each book has required non-null, non-blank fields",
+          groups = {"regression", "api", "model"})
+    @Story("Book model – required fields")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Validates isbn, title, author are non-null and non-blank for every book.")
     public void eachBookHasRequiredFields() {
         List<Book> books = booksClient.getAllBooks();
 
         for (Book book : books) {
-            assertNotNull(book.getIsbn(),   "ISBN should not be null for: "    + book);
-            assertNotNull(book.getTitle(),  "Title should not be null for: "   + book);
-            assertNotNull(book.getAuthor(), "Author should not be null for: "  + book);
-            assertFalse(book.getIsbn().isBlank(),   "ISBN should not be blank");
-            assertFalse(book.getTitle().isBlank(),  "Title should not be blank");
-            assertFalse(book.getAuthor().isBlank(), "Author should not be blank");
+            String context = "Book: " + book;
+            assertNotNull(book.getIsbn(),   "isbn null for " + context);
+            assertNotNull(book.getTitle(),  "title null for " + context);
+            assertNotNull(book.getAuthor(), "author null for " + context);
+            assertFalse(book.getIsbn().isBlank(),   "isbn blank for " + context);
+            assertFalse(book.getTitle().isBlank(),  "title blank for " + context);
+            assertFalse(book.getAuthor().isBlank(), "author blank for " + context);
         }
     }
 
-    @Test(description = "Get book by specific ISBN",
-          groups = {"regression", "api"})
-    @Story("Book lookup by ISBN")
+    @Test(description = "Each book has a positive page count",
+          groups = {"regression", "api", "model"})
+    @Story("Book model – numeric fields")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Page count must be >= 1 for every book.")
+    public void eachBookHasPositivePageCount() {
+        booksClient.getAllBooks().forEach(book ->
+                assertTrue(book.getPages() >= 1,
+                        "Expected pages >= 1 for: " + book)
+        );
+    }
+
+    @Test(description = "Get book by specific ISBN returns correct record",
+          groups = {"regression", "api", "single-book"})
+    @Story("Single book lookup – by ISBN")
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Retrieve a single book by ISBN and verify its title and author.")
-    public void getBookByIsbnReturnsCorrectBook() {
+    @TmsLink("TC-101")
+    @Description("GET /BookStore/v1/Book?ISBN=9781449325862 returns the correct book record.")
+    public void getBookByIsbnReturnsCorrectRecord() {
         Book book = booksClient.getBookByIsbn(KNOWN_ISBN);
 
-        assertEquals(book.getIsbn(), KNOWN_ISBN,
-                "ISBN should match the requested value");
-        assertNotNull(book.getTitle(),  "Title should not be null");
-        assertNotNull(book.getAuthor(), "Author should not be null");
-        log.info("Found book: title='{}', author='{}'", book.getTitle(), book.getAuthor());
+        assertEquals(book.getIsbn(), KNOWN_ISBN, "ISBN mismatch");
+        assertNotNull(book.getTitle(),  "Title must not be null");
+        assertNotNull(book.getAuthor(), "Author must not be null");
+        log.info("Verified book by ISBN: {}", book);
     }
 
-    @Test(description = "Books list contains at least 8 books",
-          groups = {"regression", "api"})
-    @Story("Books list size")
-    @Severity(SeverityLevel.NORMAL)
-    @Description("The DemoQA catalogue is known to contain 8 books. Verify the count.")
-    public void booksListHasExpectedSize() {
-        List<Book> books = booksClient.getAllBooks();
-
-        assertTrue(books.size() >= 8,
-                "Expected at least 8 books, got: " + books.size());
-    }
-
-    @Test(description = "First book has a positive page count",
-          groups = {"regression", "api"})
-    @Story("Book model – numeric field")
+    @Test(description = "Each book's website field is a non-blank URI",
+          groups = {"regression", "api", "model"})
+    @Story("Book model – website URI field")
     @Severity(SeverityLevel.MINOR)
-    @Description("Verify that the 'pages' field is a positive integer.")
-    public void firstBookHasPositivePageCount() {
-        Book first = booksClient.getFirstBook();
-
-        assertTrue(first.getPages() > 0,
-                "Page count should be positive, was: " + first.getPages());
+    @Description("The 'website' field should be a non-blank string (URI format validated by schema).")
+    public void eachBookHasNonBlankWebsite() {
+        booksClient.getAllBooks().forEach(book ->
+                assertFalse(book.getWebsite() == null || book.getWebsite().isBlank(),
+                        "Website is null/blank for: " + book)
+        );
     }
 }
