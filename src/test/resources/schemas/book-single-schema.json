@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SingleBookResponse",
+  "description": "JSON Schema for a single Book object (used in list items validation)",
+  "type": "object",
+  "required": ["isbn", "title", "subTitle", "author", "publish_date", "publisher", "pages", "description", "website"],
+  "properties": {
+    "isbn": {
+      "type": "string",
+      "minLength": 10,
+      "description": "ISBN (10 or 13 digits)"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subTitle": {
+      "type": "string"
+    },
+    "author": {
+      "type": "string",
+      "minLength": 1
+    },
+    "publish_date": {
+      "type": "string"
+    },
+    "publisher": {
+      "type": "string"
+    },
+    "pages": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "additionalProperties": false
+}
