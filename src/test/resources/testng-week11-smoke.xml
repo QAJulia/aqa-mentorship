@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+    testng-week11-smoke.xml
+    ══════════════════════════════════════════════════════════════════════════════
+    SMOKE suite – fast sanity gate.
+
+    Purpose:
+      Run this suite on every push / pull request to catch obvious regressions
+      before investing in a full regression run.
+
+    Selection strategy:
+      Only @Test(groups = {"smoke", ...}) methods are included.
+      In this project that covers:
+        BooksApiTest:        getBooksReturns200Json, getBooksRespondsWithin3Seconds
+        SchemaValidationTest: booksListConformsToSchema, singleBookConformsToSchema
+        RequestSpecTest:     defaultSpecSetsHeadersCorrectly, responseSpecValidatesStatusAndContentType
+
+    Parallel:
+      parallel="methods" thread-count="2" – quick, low concurrency.
+-->
+<suite name="Week 11 – Smoke" verbose="1"
+       parallel="methods" thread-count="2">
+
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
+    <test name="Smoke Tests">
+        <groups>
+            <run>
+                <include name="smoke"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="api.BooksApiTest"/>
+            <class name="schema.SchemaValidationTest"/>
+            <class name="spec.RequestSpecTest"/>
+        </classes>
+    </test>
+
+</suite>

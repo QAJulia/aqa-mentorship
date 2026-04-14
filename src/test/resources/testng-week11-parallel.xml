@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+    testng-week11-parallel.xml
+    ══════════════════════════════════════════════════════════════════════════════
+    WEEK 11 – Parallel Execution Suite (default)
+
+    TestNG parallel modes:
+      methods   – each @Test method runs in its own thread (maximum parallelism)
+      classes   – all methods in a class share one thread, classes run in parallel
+      tests     – each <test> block runs in its own thread
+      instances – each instance of a data-provider-parameterised test runs in parallel
+
+    CHOICE HERE: parallel="methods" + thread-count="3"
+      - We have pure API tests with no shared state between methods.
+      - BooksClient is created fresh per @BeforeMethod (ThreadLocal in BaseApiTest).
+      - 3 threads: balances speed vs. DemoQA server rate-limiting.
+
+    IMPORTANT – @BeforeSuite vs parallel:
+      @BeforeSuite runs BEFORE any parallel threads start. It is safe to set
+      RestAssured.baseURI there because it is written exactly once before the
+      parallel phase begins. All threads only READ it during test execution.
+
+    thread-count explanation:
+      With 14 test methods and 3 threads, worst-case completion is ceil(14/3)=5
+      "rounds". In practice the slowest round determines total time.
+      Increase to 4–5 if the server allows; decrease to 2 if you see flakiness.
+-->
+<suite name="Week 11 – Parallel Execution" verbose="1"
+       parallel="methods" thread-count="3">
+
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
+    <!-- All tests, all groups, running in parallel -->
+    <test name="All API Tests – Parallel">
+        <classes>
+            <class name="api.BooksApiTest"/>
+            <class name="schema.SchemaValidationTest"/>
+            <class name="spec.RequestSpecTest"/>
+        </classes>
+    </test>
+
+</suite>

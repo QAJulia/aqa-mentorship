@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>java-aqa-mentorship</artifactId>
+    <artifactId>java-aqa-mentorship-week11</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -23,42 +23,39 @@
         <lombok.version>1.18.30</lombok.version>
         <slf4j.version>2.0.9</slf4j.version>
         <logback.version>1.4.11</logback.version>
+        <surefire.version>3.1.2</surefire.version>
+
+        <!--
+            Default suite file – overridable from command line:
+              mvn test -Dsuite=testng-week11-smoke.xml
+        -->
+        <suite>testng-week11-parallel.xml</suite>
     </properties>
 
     <dependencies>
 
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!-- REST Assured core                                               -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- REST Assured core -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>${rest-assured.version}</version>
         </dependency>
 
-        <!--
-            JSON Schema Validator – NEW in Week 10.
-            Provides RestAssured.given()...body(matchesJsonSchemaInClasspath("schema.json"))
-            Uses json-schema-validator under the hood (Everit library).
-        -->
+        <!-- JSON Schema Validator (Week 10+) -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>json-schema-validator</artifactId>
             <version>${rest-assured.version}</version>
         </dependency>
 
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!-- Jackson                                                         -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- Jackson -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
 
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!-- TestNG                                                          -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- TestNG -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -66,29 +63,21 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!-- Allure                                                          -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- Allure TestNG integration -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-testng</artifactId>
             <version>${allure.version}</version>
         </dependency>
 
-        <!--
-            allure-rest-assured – NEW explicit usage in Week 10.
-            Provides AllureRestAssured filter that attaches every request
-            and response body to the Allure report as a step attachment.
-        -->
+        <!-- Allure REST Assured filter -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-rest-assured</artifactId>
             <version>${allure.version}</version>
         </dependency>
 
-        <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!-- Utilities                                                       -->
-        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -96,12 +85,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -113,20 +102,39 @@
     <build>
         <plugins>
 
+            <!--
+                maven-surefire-plugin – Test runner.
+
+                Key Week 11 additions:
+                  • ${suite} property lets the CI (or developer) swap the XML without
+                    editing the POM: mvn test -Dsuite=testng-week11-smoke.xml
+                  • parallel / threadCount controlled inside each XML file
+                    (TestNG's approach is to declare parallelism in the suite XML,
+                     not in Surefire, so Surefire just hands off to TestNG)
+                  • forkCount=1 reuseForks=true: single JVM, threads inside it
+                    (safest for REST-Assured which is not always thread-safe by default
+                     when using RestAssured.given(); our code avoids static state so
+                     thread-local RequestSpecFactory is safe)
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>${surefire.version}</version>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/testng-week10.xml</suiteXmlFile>
+                        <suiteXmlFile>src/test/resources/${suite}</suiteXmlFile>
                     </suiteXmlFiles>
+                    <!-- AspectJ weaver for Allure annotations -->
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
                     </argLine>
+                    <!-- Tell Allure where to store raw results -->
                     <systemPropertyVariables>
                         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
                     </systemPropertyVariables>
+                    <!-- Keep JVM alive for parallel threads (default: true, explicit for clarity) -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -137,6 +145,7 @@
                 </dependencies>
             </plugin>
 
+            <!-- Allure Maven report generator -->
             <plugin>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
@@ -149,5 +158,87 @@
 
         </plugins>
     </build>
+
+    <!--
+        ═══════════════════════════════════════════════════════════════════════
+        MAVEN PROFILES – Week 11 addition
+        ═══════════════════════════════════════════════════════════════════════
+
+        A Maven Profile activates a set of configuration overrides.
+        Developers and CI pipelines activate them with:  mvn test -Psmoke
+
+        Why profiles instead of just -Dsuite=... ?
+          • Profiles can bundle multiple settings: suite file + system properties
+            (e.g. -Dui.headless=true for CI) in one activation flag.
+          • They are documented in the POM — a new developer can do:
+              mvn help:all-profiles -f week11/pom.xml
+            and immediately see what's available.
+
+        Available profiles:
+          smoke       → runs testng-week11-smoke.xml (fast, 2 threads)
+          regression  → runs testng-week11-regression.xml (all groups, 4 threads)
+          parallel    → runs testng-week11-parallel.xml (default, 3 threads)
+          ci          → smoke + force headless (for GitHub Actions)
+    -->
+    <profiles>
+
+        <!-- mvn test -Psmoke -->
+        <profile>
+            <id>smoke</id>
+            <properties>
+                <suite>testng-week11-smoke.xml</suite>
+            </properties>
+        </profile>
+
+        <!-- mvn test -Pregression -->
+        <profile>
+            <id>regression</id>
+            <properties>
+                <suite>testng-week11-regression.xml</suite>
+            </properties>
+        </profile>
+
+        <!-- mvn test -Pparallel  (default suite) -->
+        <profile>
+            <id>parallel</id>
+            <properties>
+                <suite>testng-week11-parallel.xml</suite>
+            </properties>
+        </profile>
+
+        <!--
+            mvn test -Pci
+            Used by GitHub Actions – same as smoke but ensures headless and
+            passes the Allure results dir explicitly.
+        -->
+        <profile>
+            <id>ci</id>
+            <properties>
+                <suite>testng-week11-smoke.xml</suite>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${surefire.version}</version>
+                        <configuration>
+                            <suiteXmlFiles>
+                                <suiteXmlFile>src/test/resources/${suite}</suiteXmlFile>
+                            </suiteXmlFiles>
+                            <argLine>
+                                -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                            </argLine>
+                            <systemPropertyVariables>
+                                <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                                <ui.headless>true</ui.headless>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
 
 </project>

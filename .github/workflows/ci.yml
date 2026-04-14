@@ -1,0 +1,198 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# ci.yml – GitHub Actions CI Pipeline for Week 11
+# ══════════════════════════════════════════════════════════════════════════════
+#
+# OVERVIEW
+#   This pipeline runs on every push to the `week11` branch and on every
+#   pull request targeting `main`. It:
+#     1. Checks out the repository
+#     2. Sets up JDK 11 (Temurin – free, Eclipse Foundation distribution)
+#     3. Caches the Maven local repository (~/.m2) to speed up builds
+#     4. Runs the smoke test suite via Maven (-Pci profile)
+#     5. Generates the Allure report
+#     6. Uploads allure-results + allure-report as workflow artifacts
+#        (downloadable from the Actions run page for 7 days)
+#
+# DOCKER NOTE
+#   No Docker container is needed here because:
+#     - Our tests are pure REST API tests (no browser / no GUI)
+#     - GitHub Actions provides ubuntu-latest runners with Java support
+#     - The `actions/setup-java` action handles the JDK installation
+#   If you add Selenide/UI tests later, you would either:
+#     a) Use ubuntu-latest + install Chrome manually (see commented section below)
+#     b) Use a pre-built Docker image like `selenium/standalone-chrome`
+#        via the `container:` key in the job definition
+#
+# HOW TO USE
+#   Push this repository to GitHub (any free public or private repo).
+#   The workflow triggers automatically on push to `week11` or PR to `main`.
+#
+# MANUAL TRIGGER
+#   The workflow_dispatch event allows you to run the pipeline manually
+#   from the GitHub Actions UI (Actions tab → select workflow → Run workflow).
+#
+# ══════════════════════════════════════════════════════════════════════════════
+
+name: CI – Week 11 API Tests
+
+# ── Triggers ──────────────────────────────────────────────────────────────────
+on:
+  push:
+    branches:
+      - week11          # auto-run on every push to week11 branch
+  pull_request:
+    branches:
+      - main            # auto-run on PR targeting main
+  workflow_dispatch:    # allow manual run from GitHub Actions UI
+
+# ── Global defaults ───────────────────────────────────────────────────────────
+defaults:
+  run:
+    # All `run` steps execute inside the week11 directory
+    working-directory: week11
+
+# ── Jobs ──────────────────────────────────────────────────────────────────────
+jobs:
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # JOB: smoke
+  #   Runs quickly on every push. Fails fast if a basic contract breaks.
+  # ────────────────────────────────────────────────────────────────────────────
+  smoke:
+    name: Smoke Tests (Java 11)
+    runs-on: ubuntu-latest          # free GitHub-hosted runner, ~2 vCPU / 7 GB RAM
+
+    steps:
+
+      # ── Step 1: Checkout ────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        # Checks out the branch that triggered the workflow.
+        # Full repo is needed because we read files from week11/.
+
+      # ── Step 2: Set up JDK 11 ───────────────────────────────────────────────
+      - name: Set up JDK 11 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'   # Eclipse Temurin – free, LTS, used widely in CI
+          cache: 'maven'
+          # `cache: maven` tells setup-java to cache ~/.m2/repository
+          # keyed on the hash of all pom.xml files. On a cache hit the
+          # 100+ MB Maven dependency download is skipped entirely.
+
+      # ── Step 3: Run smoke tests ─────────────────────────────────────────────
+      - name: Run smoke tests (-Pci)
+        run: mvn test -Pci --no-transfer-progress
+        # -Pci activates the `ci` Maven profile (defined in pom.xml):
+        #   • Uses testng-week11-smoke.xml  (smoke group only)
+        #   • Sets -Dui.headless=true       (safe for UI tests, ignored here)
+        # --no-transfer-progress suppresses the noisy download progress bars
+        #   from Maven output, making logs easier to read.
+
+      # ── Step 4: Generate Allure report ──────────────────────────────────────
+      - name: Generate Allure report
+        # always() ensures the report is generated even if tests fail,
+        # so you can inspect failures in the report rather than raw logs.
+        if: always()
+        run: mvn allure:report --no-transfer-progress
+        # Reads target/allure-results/ → writes target/site/allure-maven-plugin/
+
+      # ── Step 5: Upload allure-results (raw JSON) ────────────────────────────
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: week11/target/allure-results/
+          retention-days: 7
+          # Raw results are useful for:
+          #   - Re-generating the report locally: allure serve allure-results/
+          #   - Feeding into allure-history across runs (trend chart)
+
+      # ── Step 6: Upload Allure HTML report ───────────────────────────────────
+      - name: Upload Allure HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: week11/target/site/allure-maven-plugin/
+          retention-days: 7
+          # Download this artifact, open index.html in a browser to view
+          # the full Allure report with test steps, attachments, and categories.
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # JOB: regression
+  #   Full regression run. Only triggers on PR to main (not every push).
+  #   Depends on smoke passing first.
+  # ────────────────────────────────────────────────────────────────────────────
+  regression:
+    name: Full Regression (Java 11)
+    runs-on: ubuntu-latest
+    needs: smoke                    # only runs if smoke job succeeds
+    if: github.event_name == 'pull_request'
+    # Skip on push to week11 – regression is expensive, run it on PRs only.
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 11 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run full regression (-Pregression)
+        run: mvn test -Pregression --no-transfer-progress
+        # Uses testng-week11-regression.xml:
+        #   all groups, parallel="methods", thread-count="4"
+
+      - name: Generate Allure report
+        if: always()
+        run: mvn allure:report --no-transfer-progress
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-regression
+          path: week11/target/allure-results/
+          retention-days: 14        # keep regression results longer
+
+      - name: Upload Allure HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-regression
+          path: week11/target/site/allure-maven-plugin/
+          retention-days: 14
+
+# ══════════════════════════════════════════════════════════════════════════════
+# COMMENTED SECTION – Adding Chrome for Selenide UI tests (future reference)
+# ══════════════════════════════════════════════════════════════════════════════
+#
+# If you add Selenide/UI tests, uncomment the step below and add it before
+# the "Run tests" step. GitHub's ubuntu-latest runners have no browser by default.
+#
+#      - name: Install Google Chrome
+#        run: |
+#          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+#          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" \
+#            >> /etc/apt/sources.list.d/google-chrome.list'
+#          sudo apt-get update -q
+#          sudo apt-get install -y google-chrome-stable
+#          google-chrome --version
+#
+# Then pass -Dui.headless=true to your mvn command so Chrome runs without a display.
+# Selenide handles headless mode automatically when ui.headless=true is set in AppConfig.
+#
+# Alternatively, use a Docker container for the whole job:
+#   jobs:
+#     ui-tests:
+#       container:
+#         image: selenium/standalone-chrome:latest
+#       steps:
+#         - ...
